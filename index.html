@@ -120,16 +120,22 @@ input[type=range]{flex:1;accent-color:var(--rose);height:44px}
 </nav></div></header>
 
 <div class="band" id="loginBox" hidden><div class="card login">
-<h2>Welcome</h2><p class="hint">Log in to save your plan and check-ins. You can see them on any phone.</p>
+<h2 id="lTitle">Welcome back</h2><p class="hint" id="lSub">Log in to see your plan and check-ins on any phone.</p>
 <p class="pat" id="igNote" hidden>You are inside Instagram's browser. For Google login, tap <b>•••</b> → <b>Open in external browser</b>. Email login works here.</p>
 <button class="gbtn" type="button" id="gLogin"><svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>Continue with Google</button>
 <button class="gbtn" type="button" id="fLogin" style="margin-top:10px" hidden><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#1877F2"/><path fill="#fff" d="M13.4 19.5v-6h2l.3-2.4h-2.3V9.6c0-.7.2-1.1 1.2-1.1h1.2V6.3c-.2 0-1-.1-1.8-.1-1.8 0-3 1.1-3 3.1v1.8H9v2.4h2v6h2.4z"/></svg>Continue with Facebook</button>
 <p class="or">or with email</p>
-<label>Email<input type="email" id="lEmail" autocomplete="email"></label>
-<label style="margin-top:10px">Password (6+ characters)<input type="password" id="lPass" autocomplete="current-password"></label>
-<div class="two"><button class="btn" type="button" id="lIn">Log in</button><button class="btn ghost" type="button" id="lUp" style="width:100%">Create account</button></div>
-<p style="text-align:center;margin:8px 0 0"><button class="link" type="button" id="lReset">Forgot password?</button></p>
+<form id="lForm" novalidate>
+<label id="nameRow" hidden>Your name<input type="text" id="lName" autocomplete="name" style="width:100%;font:16px Nunito,sans-serif;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;min-height:44px;margin-top:4px"></label>
+<label style="margin-top:10px">Email<input type="email" id="lEmail" autocomplete="email"></label>
+<label style="margin-top:10px">Password<input type="password" id="lPass" autocomplete="current-password"></label>
+<label id="pass2Row" style="margin-top:10px" hidden>Confirm password<input type="password" id="lPass2" autocomplete="new-password"></label>
+<p class="hint" id="passHint" hidden style="margin-top:6px">At least 6 characters.</p>
+<button class="btn" type="submit" id="lSubmit" style="margin-top:14px">Log in</button>
+</form>
+<p style="text-align:center;margin:8px 0 0" id="resetRow"><button class="link" type="button" id="lReset">Forgot password?</button></p>
 <div class="err" id="lErr" aria-live="polite"></div>
+<p style="text-align:center;margin:6px 0 0"><span class="hint" id="swText">New here?</span> <button class="link" type="button" id="lSwitch">Create an account</button></p>
 <p class="or">or</p>
 <button class="btn ghost" type="button" id="lGuest" style="width:100%">Use without an account (saved on this phone only)</button>
 <p class="note">By logging in you agree to the <button class="link" type="button" data-go="privacy" style="font-size:13px">privacy policy</button>. This app gives general wellness tips, not medical advice.</p>
@@ -546,7 +552,7 @@ const showLogin=on=>{$('#boot').hidden=true;$('#loginBox').hidden=!on;$('#app').
 const lerr=t=>$('#lErr').textContent=t;
 const nice=e=>({'auth/invalid-email':'That email does not look right.','auth/missing-password':'Please type your password.','auth/weak-password':'Password needs 6 or more characters.','auth/email-already-in-use':'This email already has an account. Tap Log in.','auth/invalid-credential':'Email or password is wrong.','auth/wrong-password':'Email or password is wrong.','auth/user-not-found':'No account with this email. Tap Create account.','auth/popup-blocked':'Popup was blocked. Allow popups, or use email.','auth/popup-closed-by-user':'Login window was closed. Try again.','auth/unauthorized-domain':'This website is not added in Firebase yet (Authorized domains).','auth/too-many-requests':'Too many tries. Wait a few minutes.','auth/account-exists-with-different-credential':'You used another login with this email before. Try Continue with Google or email.','auth/requires-recent-login':'For safety, log out and log in again, then delete.'}[e&&e.code]||'Something went wrong. Please try again.');
 function setAcct(){const u=auth&&auth.currentUser&&!auth.currentUser.isAnonymous?auth.currentUser:null;
- $('#acct').innerHTML=u?`<span>Logged in: ${esc(u.email||'Google account')}</span><button class="link" type="button" id="logout" style="font-size:14px;min-height:32px">Log out</button>`:guest?`<span>Saved on this phone only</span>${auth?'<button class="link" type="button" id="toLogin" style="font-size:14px;min-height:32px">Log in to save online</button>':''}`:''}
+ $('#acct').innerHTML=u?`<span>Hi ${esc((u.displayName||'').split(' ')[0]||'there')} · ${esc(u.email||'')}</span><button class="link" type="button" id="logout" style="font-size:14px;min-height:32px">Log out</button>`:guest?`<span>Saved on this phone only</span>${auth?'<button class="link" type="button" id="toLogin" style="font-size:14px;min-height:32px">Log in to save online</button>':''}`:''}
 function clearLocal(){try{['bc-entries','bc-checks','bc-photos','bc-profile','bc-products','bc-adv','bc-guest'].forEach(k=>localStorage.removeItem(k))}catch(e){}
  entries={};checks={};photos={};profile={};products={};render();fill(today())}
 function startSync(){if(unsub)unsub();first=false;
@@ -575,19 +581,17 @@ function enableAdmin(){if(!isAdmin()||document.querySelector('[data-tab=admin]')
 if(auth){if(guest)showLogin(false);
  auth.onAuthStateChanged(u=>{
   if(u&&u.isAnonymous){track(u);guest=true;uid=null;if(unsub){unsub();unsub=null}showLogin(false);setAcct();$('#sync').textContent='Saved on this phone only.';return}
-  if(u){track(u);if(guest){guest=false;try{localStorage.removeItem('bc-guest')}catch(e){}}uid=u.uid;showLogin(false);setAcct();startSync();enableAdmin();return}
+  if(u){track(u);if(guest){guest=false;try{localStorage.removeItem('bc-guest')}catch(e){}}uid=u.uid;showLogin(false);setAcct();startSync();enableAdmin();if(location.hash!=='#privacy')goHome();return}
   uid=null;if(unsub){unsub();unsub=null}const ab=document.querySelector('[data-tab=admin]');if(ab)ab.remove();setAcct();showLogin(!guest&&location.hash!=='#privacy');
   if(guest&&!triedAnon){triedAnon=true;auth.signInAnonymously().catch(()=>{})}$('#sync').textContent=guest?'Saved on this phone only.':''})}
 else{showLogin(false);$('#acct').innerHTML='';}
 $('#gLogin').addEventListener('click',()=>{lerr('');if(!auth)return lerr('Login is not set up yet.');auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e=>lerr(nice(e)))});
 if(FACEBOOK_ON)$('#fLogin').hidden=false;
 $('#fLogin').addEventListener('click',()=>{lerr('');if(!auth)return;const pr=new firebase.auth.FacebookAuthProvider();pr.addScope('email');auth.signInWithPopup(pr).catch(e=>lerr(nice(e)))});
-$('#lIn').addEventListener('click',()=>{lerr('');if(!auth)return;auth.signInWithEmailAndPassword($('#lEmail').value.trim(),$('#lPass').value).catch(e=>lerr(nice(e)))});
-$('#lUp').addEventListener('click',()=>{lerr('');if(!auth)return;auth.createUserWithEmailAndPassword($('#lEmail').value.trim(),$('#lPass').value).catch(e=>lerr(nice(e)))});
 $('#lReset').addEventListener('click',()=>{const m=$('#lEmail').value.trim();if(!m){lerr('Type your email first, then tap Forgot password.');return}
  auth&&auth.sendPasswordResetEmail(m).then(()=>lerr('Check your email for a reset link.')).catch(e=>lerr(nice(e)))});
 $('#lGuest').addEventListener('click',()=>{guest=true;try{localStorage.setItem('bc-guest','1')}catch(e){}showLogin(false);setAcct();$('#sync').textContent='Saved on this phone only.';if(auth&&!auth.currentUser){triedAnon=true;auth.signInAnonymously().catch(()=>{})}});
-$('#acct').addEventListener('click',e=>{if(e.target.id==='logout'){auth.signOut().then(clearLocal)}if(e.target.id==='toLogin'){guest=false;try{localStorage.removeItem('bc-guest')}catch(e){}if(auth.currentUser&&auth.currentUser.isAnonymous)auth.signOut();setAcct();showLogin(true)}});
+$('#acct').addEventListener('click',e=>{if(e.target.id==='logout'){auth.signOut().then(()=>{clearLocal();setMode('login');$('#lPass').value='';goHome()})}if(e.target.id==='toLogin'){guest=false;try{localStorage.removeItem('bc-guest')}catch(e){}if(auth.currentUser&&auth.currentUser.isAnonymous)auth.signOut();setAcct();showLogin(true)}});
 document.addEventListener('click',e=>{const b=e.target.closest('[data-go=privacy]');if(!b)return;
  if(!$('#loginBox').hidden){showLogin(false)}document.querySelectorAll('main section').forEach(x=>x.hidden=x.id!=='privacy');
  document.querySelectorAll('nav button').forEach(n=>n.setAttribute('aria-selected','false'));$('#privacy').scrollIntoView()});
@@ -598,6 +602,31 @@ $('#delAcc').addEventListener('click',async()=>{const b=$('#delAcc'),m=$('#delMs
   if(sr)await sr.set({deleted:today()},{merge:true}).catch(()=>{});
   if(cu&&!cu.isAnonymous)await cu.delete().catch(async e=>{if(sr)await sr.set({deleted:null},{merge:true}).catch(()=>{});throw e});clearLocal();m.textContent='Your data has been deleted.';b.textContent='Delete my account and data'}
  catch(e){m.textContent=nice(e)}});
+/* login / sign-up screens */
+let mode='login';
+function setMode(m){mode=m;const up=m==='signup';lerr('');
+ $('#lTitle').textContent=up?'Create your account':'Welcome back';
+ $('#lSub').textContent=up?'Free. Your plan and check-ins are saved and private to you.':'Log in to see your plan and check-ins on any phone.';
+ $('#nameRow').hidden=!up;$('#pass2Row').hidden=!up;$('#passHint').hidden=!up;$('#resetRow').hidden=up;
+ $('#lSubmit').textContent=up?'Create account':'Log in';$('#lPass').autocomplete=up?'new-password':'current-password';
+ $('#swText').textContent=up?'Already have an account?':'New here?';$('#lSwitch').textContent=up?'Log in':'Create an account';
+ $('#gLogin').lastChild.textContent=up?'Sign up with Google':'Continue with Google'}
+$('#lSwitch').addEventListener('click',()=>setMode(mode==='login'?'signup':'login'));
+$('#lForm').addEventListener('submit',async e=>{e.preventDefault();lerr('');if(!auth)return lerr('Login is not set up yet.');
+ const em=$('#lEmail').value.trim(),pw=$('#lPass').value;
+ if(mode==='signup'&&!$('#lName').value.trim())return lerr('Please type your name.');
+ if(!em)return lerr('Please type your email.');
+ if(!/^\S+@\S+\.\S+$/.test(em))return lerr('That email does not look right.');
+ if(!pw)return lerr('Please type your password.');
+ if(mode==='signup'){if(pw.length<6)return lerr('Password needs 6 or more characters.');if(pw!==$('#lPass2').value)return lerr('The two passwords are not the same.')}
+ const b=$('#lSubmit'),t=b.textContent;b.disabled=true;b.textContent=mode==='signup'?'Creating…':'Logging in…';
+ try{if(mode==='signup'){const r=await auth.createUserWithEmailAndPassword(em,pw);try{await r.user.updateProfile({displayName:$('#lName').value.trim()});r.user.sendEmailVerification().catch(()=>{})}catch(x){}setAcct()}
+  else await auth.signInWithEmailAndPassword(em,pw)}
+ catch(err){lerr(nice(err))}
+ b.disabled=false;b.textContent=t});
+function goHome(){document.querySelectorAll('nav button').forEach(n=>n.setAttribute('aria-selected',n.dataset.tab==='today'?'true':'false'));
+ document.querySelectorAll('main section').forEach(x=>x.hidden=x.id!=='today');window.scrollTo(0,0)}
+
 /* ---------- owner dashboard ---------- */
 const dayStr=n=>{const d=new Date();d.setDate(d.getDate()-n);return new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
 async function loadAdmin(){if(!isAdmin())return;$('#aWhen').textContent='Loading…';
