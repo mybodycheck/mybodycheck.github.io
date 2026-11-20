@@ -109,7 +109,7 @@ input[type=range]{flex:1;accent-color:var(--rose);height:44px}
 <h1>My Body Check</h1>
 <p class="sub">Your plan for today: water, skin, food and body. Plus checks for your products.</p>
 <div class="acct" id="acct"></div>
-<nav role="tablist">
+<nav role="tablist" hidden>
 <button role="tab" data-tab="today" aria-selected="true">My plan</button>
 <button role="tab" data-tab="checkin" aria-selected="false">Check-in</button>
 <button role="tab" data-tab="products" aria-selected="false">Products</button>
@@ -135,7 +135,8 @@ input[type=range]{flex:1;accent-color:var(--rose);height:44px}
 <p class="note">By logging in you agree to the <button class="link" type="button" data-go="privacy" style="font-size:13px">privacy policy</button>. This app gives general wellness tips, not medical advice.</p>
 </div></div>
 
-<main id="app"><div class="wrap">
+<div class="band" id="boot" style="text-align:center;color:var(--soft)"><p>Loading…</p></div>
+<main id="app" hidden><div class="wrap">
 <section id="today">
 <div class="card" id="setup" hidden><h2>About me</h2><p class="hint">Fill this once. Your plan uses it.</p>
 <label>Body weight (kg)<input type="number" id="pWeight" min="30" max="200" inputmode="decimal"></label>
@@ -541,7 +542,7 @@ $('#copyAl').addEventListener('click',async()=>{try{await navigator.clipboard.wr
 /* ---------- accounts (Firebase) ---------- */
 let auth=null,unsub=null,guest=false;
 try{guest=localStorage.getItem('bc-guest')==='1'}catch(e){}
-const showLogin=on=>{$('#loginBox').hidden=!on;$('#app').hidden=on;document.querySelector('nav').hidden=on};
+const showLogin=on=>{$('#boot').hidden=true;$('#loginBox').hidden=!on;$('#app').hidden=on;document.querySelector('nav').hidden=on};
 const lerr=t=>$('#lErr').textContent=t;
 const nice=e=>({'auth/invalid-email':'That email does not look right.','auth/missing-password':'Please type your password.','auth/weak-password':'Password needs 6 or more characters.','auth/email-already-in-use':'This email already has an account. Tap Log in.','auth/invalid-credential':'Email or password is wrong.','auth/wrong-password':'Email or password is wrong.','auth/user-not-found':'No account with this email. Tap Create account.','auth/popup-blocked':'Popup was blocked. Allow popups, or use email.','auth/popup-closed-by-user':'Login window was closed. Try again.','auth/unauthorized-domain':'This website is not added in Firebase yet (Authorized domains).','auth/too-many-requests':'Too many tries. Wait a few minutes.','auth/account-exists-with-different-credential':'You used another login with this email before. Try Continue with Google or email.','auth/requires-recent-login':'For safety, log out and log in again, then delete.'}[e&&e.code]||'Something went wrong. Please try again.');
 function setAcct(){const u=auth&&auth.currentUser&&!auth.currentUser.isAnonymous?auth.currentUser:null;
@@ -564,13 +565,14 @@ const cfgOk=window.firebase&&!/PASTE/.test(FIREBASE_CONFIG.apiKey);
 if(cfgOk){try{firebase.initializeApp(FIREBASE_CONFIG);auth=firebase.auth();db=firebase.firestore()}catch(e){auth=null;db=null}}
 if(/Instagram|FBAN|FBAV/i.test(navigator.userAgent))$('#igNote').hidden=false;
 let triedAnon=false;
+setTimeout(()=>{if(!$('#boot').hidden)showLogin(!guest)},8000);
 async function track(u){try{const t=today();let last=null;try{last=localStorage.getItem('bc-seen-'+u.uid)}catch(e){}if(last===t)return;
  const r=db.collection('stats').doc(u.uid),g=await r.get(),v={lastActive:t,days:firebase.firestore.FieldValue.arrayUnion(t),anon:!!u.isAnonymous};
  if(!g.exists)v.created=t;await r.set(v,{merge:true});try{localStorage.setItem('bc-seen-'+u.uid,t)}catch(e){}}catch(e){}}
 const isAdmin=()=>!!(auth&&auth.currentUser&&!auth.currentUser.isAnonymous&&auth.currentUser.uid===ADMIN_UID);
 function enableAdmin(){if(!isAdmin()||document.querySelector('[data-tab=admin]'))return;
  const b=document.createElement('button');b.setAttribute('role','tab');b.dataset.tab='admin';b.setAttribute('aria-selected','false');b.textContent='Dashboard';document.querySelector('nav').appendChild(b)}
-if(auth){showLogin(!guest);
+if(auth){if(guest)showLogin(false);
  auth.onAuthStateChanged(u=>{
   if(u&&u.isAnonymous){track(u);guest=true;uid=null;if(unsub){unsub();unsub=null}showLogin(false);setAcct();$('#sync').textContent='Saved on this phone only.';return}
   if(u){track(u);if(guest){guest=false;try{localStorage.removeItem('bc-guest')}catch(e){}}uid=u.uid;showLogin(false);setAcct();startSync();enableAdmin();return}
