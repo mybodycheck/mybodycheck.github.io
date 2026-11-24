@@ -2,654 +2,742 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FBF1F4">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Body Check">
 <title>My Body Check</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23A23D63'/%3E%3Ccircle cx='32' cy='32' r='17' fill='none' stroke='%23fff' stroke-width='6' stroke-dasharray='22 5' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23A23D63'/%3E%3Ccircle cx='32' cy='32' r='17' fill='none' stroke='%23fff' stroke-width='6' stroke-dasharray='22 5' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* VOICE: tender, calm, private, like a kind nurse's notebook
-   IDEA: a daily body diary that turns small check-ins into patterns
-   PICTURE: the check-in card itself, then soft trend charts and a photo diary
-   COLOUR and TYPE: white ground, deep rose lead, blush support, teal accent; Outfit titles, Nunito text
-   LAYOUT: one calm column, tabs on top, big touch targets for the phone */
-:root{color-scheme:light dark;
---bg:light-dark(#ffffff,#1a1216);--ink:light-dark(#2a1b22,#f6e9ee);--soft:light-dark(#6f5a63,#c9b2bc);
---rose:light-dark(#b23a62,#ef7fa3);--blush:light-dark(#fcebf0,#2c1b23);--line:light-dark(#efd3dc,#3d2832);
---teal:light-dark(#0e6f6c,#5fd0c8);--gold:light-dark(#b07a12,#e8b94e);--card:light-dark(#ffffff,#22171d)}
-:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
-*{box-sizing:border-box;min-width:0}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Nunito,system-ui,sans-serif;overflow-x:clip}
-h1,h2,h3{font-family:Outfit,system-ui,sans-serif;line-height:1.1;margin:0;text-wrap:balance}
-h1{font-size:clamp(28px,6vw,40px);color:var(--rose)}
-h2{font-size:22px;margin-bottom:12px}
-.top{background:var(--blush);padding:24px max(5vw,16px) 0}
-.wrap{max-width:720px;margin:0 auto}
-.sub{color:var(--soft);margin:6px 0 16px}
-nav{display:flex;gap:4px;overflow-x:auto}
-nav button{flex:none;border:0;background:none;font:600 16px Nunito,sans-serif;color:var(--soft);padding:12px 14px;min-height:44px;border-radius:12px 12px 0 0;cursor:pointer}
-nav button[aria-selected=true]{background:var(--bg);color:var(--rose)}
-main{padding:20px max(5vw,16px) 48px}
-section[hidden]{display:none}
-.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:16px}
-.card h3{font-size:17px;margin-bottom:4px}
-.zone{font-weight:700;color:var(--rose);margin:10px 0 2px}
-.hint{color:var(--soft);font-size:14px;margin:0 0 10px}
-label{display:block;font-weight:600}
-.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px}
-input[type=number],input[type=date],textarea{width:100%;font:16px Nunito,sans-serif;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;min-height:44px;margin-top:4px}
-textarea{min-height:80px;resize:vertical}
-input:focus-visible,textarea:focus-visible,button:focus-visible,.upl:focus-within{outline:3px solid var(--teal);outline-offset:2px}
-.slide{display:flex;align-items:center;gap:12px;margin-top:6px}
-input[type=range]{flex:1;accent-color:var(--rose);height:44px}
-.val{font:700 22px Outfit,sans-serif;color:var(--rose);min-width:3.2em;text-align:right;white-space:nowrap}
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
-.chip{border:1.5px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:8px 14px;min-height:44px;font:600 15px Nunito,sans-serif;cursor:pointer}
-.chip[aria-pressed=true]{background:var(--rose);border-color:var(--rose);color:#fff}
-.btn{border:0;background:var(--rose);color:#fff;font:700 17px Outfit,sans-serif;border-radius:14px;padding:14px 22px;min-height:48px;cursor:pointer;width:100%}
-.btn.ghost{background:none;color:var(--rose);border:1.5px solid var(--rose);width:auto;font-size:15px;padding:10px 16px;min-height:44px}
-.upl{display:flex;align-items:center;justify-content:center;gap:8px;border:2px dashed var(--rose);border-radius:14px;min-height:56px;color:var(--rose);font:700 16px Outfit,sans-serif;cursor:pointer;padding:10px}
-.upl input{position:absolute;opacity:0;width:1px;height:1px}
-.scan{display:grid;grid-template-columns:110px 1fr;gap:14px;align-items:start;margin-top:12px}
-.scan img{width:110px;height:110px;object-fit:cover;border-radius:12px}
-.msg{min-height:1.5em;color:var(--teal);font-weight:700;margin-top:10px;text-align:center}
-.result{font:700 clamp(26px,6vw,34px) Outfit,sans-serif;color:var(--rose);margin:4px 0}
-.fig{position:relative;min-height:240px}.fig>svg{position:absolute;inset:0;width:100%;height:100%}
-.key{display:flex;gap:16px;flex-wrap:wrap;font-size:14px;color:var(--soft);margin-top:8px}
-.key i{display:inline-block;width:14px;height:4px;border-radius:2px;vertical-align:middle;margin-right:6px}
-.list{list-style:none;padding:0;margin:0}
-.list li{border-top:1px solid var(--line);padding:12px 0;display:flex;justify-content:space-between;gap:12px;align-items:start}
-.list b{white-space:nowrap}
-.del{border:0;background:none;color:var(--soft);font-size:14px;cursor:pointer;min-height:44px;padding:0 8px}
-.check li{justify-content:flex-start}
-.check input{width:22px;height:22px;accent-color:var(--teal);margin-top:2px;flex:none}
-.pat{background:var(--blush);border-radius:14px;padding:12px 14px;margin:8px 0}
-.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.stat{background:var(--blush);border-radius:14px;padding:12px;text-align:center}
-.stat b{display:block;font:700 clamp(22px,5vw,30px) Outfit,sans-serif;color:var(--teal)}
-.stat span{font-size:13px;color:var(--soft)}
-.photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
-.photos figure{margin:0}.photos img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px}
-.photos figcaption{font-size:12px;color:var(--soft);text-align:center}
-.note{font-size:13px;color:var(--soft);margin-top:16px}
-.sync{font-size:13px;color:var(--soft);text-align:right;margin-top:6px}
-.slot{border-top:1px solid var(--line);padding:12px 0}
-.slot.now{background:var(--blush);border:0;border-radius:14px;padding:12px;margin:6px 0}
-.slot b{font-family:Outfit,sans-serif}
-.glasses{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-.gl{width:44px;height:44px;border-radius:12px;border:2px solid var(--teal);background:none;cursor:pointer;color:var(--teal);font:700 13px Nunito,sans-serif}
-.gl[aria-pressed=true]{background:var(--teal);color:#fff}
-.big{font:700 clamp(30px,7vw,44px) Outfit,sans-serif;color:var(--teal);line-height:1.1}
-.steps{margin:4px 0 12px;padding-left:22px}.steps li{margin:5px 0}
-.badge{display:inline-block;border-radius:999px;padding:3px 10px;font:700 13px Nunito,sans-serif;color:#fff;white-space:nowrap}
-.b-good{background:var(--teal)}.b-care{background:var(--gold)}.b-avoid{background:var(--rose)}
-.prod{display:grid;grid-template-columns:84px minmax(0,1fr);gap:12px;border-top:1px solid var(--line);padding:14px 0}
-.prod img{width:84px;height:84px;object-fit:cover;border-radius:10px}
-.prod p{margin:4px 0}
-.react{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.react button{border:1.5px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:6px 12px;min-height:44px;font:600 14px Nunito,sans-serif;cursor:pointer}
-.react button[aria-pressed=true]{background:var(--teal);border-color:var(--teal);color:#fff}
-.warn{background:var(--blush);border-left:4px solid var(--rose);padding:8px 12px;border-radius:8px;margin-top:8px}
-.advice p{margin:8px 0}
-.link{border:0;background:none;color:var(--rose);font:700 15px Nunito,sans-serif;cursor:pointer;min-height:44px;padding:0}
-.login{max-width:440px;margin:0 auto}
-.login input[type=email],.login input[type=password]{width:100%;font:16px Nunito,sans-serif;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;min-height:44px;margin-top:4px}
+/* Design: a gentle daily body diary for mothers. Memorable element = the segmented "care ring" on Today.
+   Colour per area (Clue-style): water, skin, body, gut, sleep. Young Serif for warm headings, Figtree for UI. */
+:root{
+ --bg:#FFFFFF; --wash:#FBF1F4; --wash2:#F6E6EC; --ink:#2A1F26; --muted:#75626C; --line:#EEDDE4;
+ --berry:#A23D63; --berry-d:#86304F;
+ --water:#2A86AE; --skin:#D0668A; --body:#6E5AB8; --gut:#3E8B5C; --sleep:#3D55A3;
+ --r-lg:26px; --r:18px; --r-sm:12px;
+ --tab:68px; --safe:env(safe-area-inset-bottom,0px);
+ color-scheme:light;
+}
+*{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent}
 [hidden]{display:none!important}
-.gbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:50px;border:1.5px solid var(--line);border-radius:14px;background:var(--bg);color:var(--ink);font:700 16px Nunito,sans-serif;cursor:pointer}
-.or{text-align:center;color:var(--soft);margin:14px 0;font-size:14px}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.err{color:var(--rose);font-weight:700;min-height:1.4em;margin-top:8px}
-.acct{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:14px;color:var(--soft);margin:-6px 0 12px}
-.foot{display:flex;gap:16px;justify-content:center;margin-top:24px}
-@media(max-width:420px){.scan{grid-template-columns:1fr}.scan img{width:100%;height:auto;aspect-ratio:1}}
-@media(prefers-reduced-motion:no-preference){.chip{transition:background .2s}}
+html,body{margin:0;background:var(--wash2);color:var(--ink);font:15px/1.45 Figtree,system-ui,sans-serif}
+h1,h2,h3{margin:0;font-weight:400;font-family:"Young Serif",Georgia,serif;line-height:1.15}
+h2{font-size:21px}h3{font-size:17px}
+p{margin:0}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--water);outline-offset:2px}
+.shell{max-width:460px;margin:0 auto;min-height:100vh;min-height:100dvh;background:var(--bg);position:relative}
+@media(min-width:520px){.shell{box-shadow:0 0 0 1px var(--line),0 30px 80px -30px rgba(162,61,99,.35)}}
+
+/* splash */
+.splash{min-height:100vh;min-height:100dvh;display:grid;place-items:center;background:var(--wash)}
+.splash svg{width:72px;height:72px;animation:spin 1.6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.splash svg{animation:none}}
+
+/* auth */
+.auth{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+.auth-art{background:var(--wash);padding:calc(28px + env(safe-area-inset-top,0px)) 24px 22px;position:relative;overflow:hidden}
+.auth-art svg.rings{position:absolute;right:-50px;top:-40px;width:220px;height:220px;opacity:.9}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px;color:var(--berry)}
+.brand i{width:30px;height:30px;border-radius:9px;background:var(--berry);display:grid;place-items:center}
+.auth-art h1{font-size:30px;margin:26px 0 8px;max-width:15ch}
+.auth-art p{color:var(--muted);max-width:30ch}
+.auth-body{padding:20px 24px calc(28px + var(--safe));flex:1;display:flex;flex-direction:column;gap:14px}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--wash);border-radius:14px;padding:4px}
+.seg button{border:0;background:none;border-radius:11px;min-height:40px;font-weight:600;color:var(--muted)}
+.seg button[aria-pressed=true]{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(42,31,38,.12)}
+.gbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:48px;border:1.5px solid var(--line);border-radius:14px;background:#fff;font-weight:600}
+.or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.field{display:grid;gap:5px;font-size:13px;font-weight:600;color:var(--muted)}
+.field input{width:100%;min-height:48px;border:1.5px solid var(--line);border-radius:14px;padding:0 14px;font-size:16px;font-weight:500;color:var(--ink);background:#fff}
+.field input:focus{border-color:var(--berry);outline:none}
+.form{display:grid;gap:10px}
+.btn{border:0;border-radius:14px;min-height:50px;padding:0 18px;background:var(--berry);color:#fff;font-weight:700;font-size:16px;width:100%}
+.btn:active{background:var(--berry-d)}
+.btn[disabled]{opacity:.6}
+.btn.soft{background:var(--wash);color:var(--berry)}
+.btn.small{min-height:40px;font-size:14px;width:auto;padding:0 14px}
+.link{border:0;background:none;color:var(--berry);font-weight:600;padding:6px 0;min-height:36px}
+.err{color:#B3263E;font-weight:600;font-size:14px;min-height:0}
+.err:empty{display:none}
+.note{font-size:12.5px;color:var(--muted)}
+.center{text-align:center}
+.ig{background:#FFF6E0;border-radius:12px;padding:10px 12px;font-size:13px}
+
+/* app chrome */
+.top{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);padding:calc(12px + env(safe-area-inset-top,0px)) 18px 10px;display:flex;align-items:center;gap:12px;border-bottom:1px solid transparent}
+.top.scrolled{border-bottom-color:var(--line)}
+.top .hello{flex:1}
+.top .hello b{display:block;font-family:"Young Serif",serif;font-weight:400;font-size:20px}
+.top .hello span{font-size:13px;color:var(--muted)}
+.avatar{width:40px;height:40px;border-radius:50%;border:0;background:var(--wash);color:var(--berry);font-weight:700;font-size:16px;display:grid;place-items:center}
+main{padding:6px 16px calc(var(--tab) + var(--safe) + 24px)}
+.view{display:grid;gap:14px}
+.tabbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,460px);height:calc(var(--tab) + var(--safe));padding-bottom:var(--safe);background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);z-index:10}
+.tabbar button{border:0;background:none;display:grid;justify-items:center;align-content:center;gap:3px;font-size:11.5px;font-weight:600;color:var(--muted)}
+.tabbar svg{width:24px;height:24px}
+.tabbar button[aria-current]{color:var(--berry)}
+
+/* cards */
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.card.tint{background:var(--wash);border-color:transparent}
+.head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.head h3{flex:1}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.sub{font-size:13px;color:var(--muted)}
+.row{display:flex;align-items:center;gap:10px}
+.spread{display:flex;align-items:center;justify-content:space-between;gap:10px}
+
+/* hero ring */
+.hero{background:var(--wash);border-radius:var(--r-lg);padding:18px;display:grid;grid-template-columns:150px 1fr;gap:14px;align-items:center}
+.ring{position:relative;width:150px;height:150px}
+.ring svg{width:150px;height:150px;display:block}
+.ring .score{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.ring .score b{font-family:"Young Serif",serif;font-weight:400;font-size:40px;line-height:1}
+.ring .score span{font-size:12px;color:var(--muted)}
+.legend{display:grid;gap:8px}
+.legend button{border:0;background:none;padding:0;display:grid;grid-template-columns:10px 1fr auto;gap:8px;align-items:center;text-align:left;font-size:14px;min-height:28px}
+.legend em{font-style:normal;color:var(--muted);font-size:13px;white-space:nowrap}
+@media(max-width:360px){.hero{grid-template-columns:1fr;justify-items:center}.legend{width:100%}}
+
+.next{display:flex;align-items:center;gap:12px;border-radius:var(--r);padding:14px 14px 14px 16px;color:#fff;background:var(--berry)}
+.next p{flex:1;font-weight:600}
+.next small{display:block;font-weight:500;opacity:.85}
+.next button{border:0;background:#fff;color:var(--berry);font-weight:700;border-radius:12px;min-height:40px;padding:0 14px;white-space:nowrap}
+
+/* water */
+.drops{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 12px}
+.drop{width:34px;height:40px;border:0;background:none;padding:0}
+.drop svg{width:34px;height:40px}
+.drop path{fill:#E4F1F7;stroke:var(--water);stroke-width:1.6}
+.drop[aria-pressed=true] path{fill:var(--water)}
+.bar{height:8px;border-radius:99px;background:#E4F1F7;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--water);border-radius:99px;transition:width .35s}
+.stepper{display:flex;align-items:center;gap:8px}
+.stepper button{width:44px;height:44px;border-radius:12px;border:1.5px solid var(--line);background:#fff;font-size:20px;font-weight:600}
+.stepper .btn{width:auto;height:44px;border:0;background:var(--berry);color:#fff;font-size:15px;padding:0 16px}
+.stepper output{min-width:28px;text-align:center;font-weight:700;font-size:17px}
+
+/* checklist */
+.check{display:grid;gap:2px}
+.check label{display:grid;grid-template-columns:26px 1fr;gap:10px;align-items:start;padding:9px 2px;border-bottom:1px solid var(--line);font-size:14.5px}
+.check label:last-child{border-bottom:0}
+.check input{appearance:none;width:24px;height:24px;border-radius:8px;border:2px solid var(--line);margin:0;display:grid;place-items:center;background:#fff}
+.check input:checked{background:var(--skin);border-color:var(--skin)}
+.check input:checked::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.check input:checked+span{color:var(--muted);text-decoration:line-through}
+.seg.sm{margin-bottom:8px}.seg.sm button{min-height:34px;font-size:14px}
+
+/* chips / bubbles */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:999px;min-height:40px;padding:0 14px;font-weight:600;font-size:14px}
+.chip[aria-pressed=true]{color:#fff;border-color:var(--c,var(--berry));background:var(--c,var(--berry))}
+.scale{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.scale button{border:1.5px solid var(--line);background:#fff;border-radius:12px;min-height:54px;display:grid;place-content:center;gap:2px;font-size:11.5px;font-weight:600;color:var(--muted);padding:4px 2px}
+.scale button b{font-size:16px;color:var(--ink)}
+.scale button[aria-pressed=true]{background:var(--c);border-color:var(--c);color:#fff}
+.scale button[aria-pressed=true] b{color:#fff}
+.q{font-weight:600;font-size:14px;margin:14px 0 8px}
+.q:first-of-type{margin-top:0}
+.sec{border-radius:var(--r);border:1px solid var(--line);padding:16px;background:#fff}
+.sec>.head{margin-bottom:10px}
+.ico{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;flex:none}
+.ico svg{width:18px;height:18px}
+.datebar{display:flex;align-items:center;justify-content:space-between;background:var(--wash);border-radius:14px;padding:4px}
+.datebar button{width:44px;height:40px;border:0;background:none;font-size:20px;color:var(--berry);border-radius:10px}
+.datebar button[disabled]{opacity:.3}
+.datebar b{font-weight:700}
+.savebar{position:sticky;bottom:calc(var(--tab) + var(--safe) + 10px);z-index:4}
+.savebar .btn{box-shadow:0 10px 24px -10px rgba(162,61,99,.6)}
+textarea{width:100%;min-height:80px;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;font-size:16px;resize:vertical}
+details summary{cursor:pointer;font-weight:600;font-size:14px;color:var(--berry);min-height:36px;display:flex;align-items:center;list-style:none}
+details summary::-webkit-details-marker{display:none}
+details summary::after{content:"+";margin-left:auto;font-size:20px}
+details[open] summary::after{content:"–"}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mini input{min-height:44px}
+
+/* photo */
+.photo{display:flex;gap:12px;align-items:center}
+.photo img{width:64px;height:64px;border-radius:14px;object-fit:cover}
+.upl{display:inline-flex;align-items:center;gap:8px;border:1.5px dashed var(--skin);color:var(--skin);border-radius:14px;min-height:48px;padding:0 16px;font-weight:600;cursor:pointer;position:relative}
+.upl input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.photos{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.photos figure{margin:0}.photos img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;display:block}
+.photos figcaption{font-size:11px;color:var(--muted);text-align:center;margin-top:2px}
+
+/* tips carousel */
+.tips{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -16px;padding:2px 16px 4px;scrollbar-width:none}
+.tips::-webkit-scrollbar{display:none}
+.tip{flex:0 0 76%;scroll-snap-align:start;border-radius:var(--r);padding:14px;background:var(--wash)}
+.tip b{display:flex;align-items:center;gap:8px;font-size:14px;margin-bottom:4px}
+.tip p{font-size:14px;color:var(--muted)}
+
+/* insights */
+.fig{position:relative;height:190px}.fig svg{position:absolute;inset:0;width:100%;height:100%}
+.key{display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;color:var(--muted);margin-top:8px}
+.key i{display:inline-block;width:12px;height:4px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.pat{display:grid;grid-template-columns:10px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+.pat:last-child{border-bottom:0}
+.pat .dot{margin-top:5px}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tile{background:var(--wash);border-radius:14px;padding:12px 8px;text-align:center}
+.tile b{display:block;font-family:"Young Serif",serif;font-weight:400;font-size:24px}
+.tile span{font-size:12px;color:var(--muted)}
+.hist{display:grid}
+.hist div{padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.hist div:last-child{border-bottom:0}
+
+/* skin type */
+.skinhero{border-radius:var(--r-lg);padding:18px;background:linear-gradient(135deg,#FBE3EC,#FBF1F4)}
+.skinhero b{display:block;font-family:"Young Serif",serif;font-weight:400;font-size:30px;color:var(--berry);margin:4px 0 6px}
+.prod{display:grid;grid-template-columns:52px 1fr;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.prod:last-child{border-bottom:0}
+.prod img,.prod .ph{width:52px;height:52px;border-radius:12px;object-fit:cover;background:var(--wash)}
+.react{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.react .chip{min-height:34px;padding:0 11px;font-size:13px}
+.warn{margin-top:8px;background:#FDECEF;border-radius:10px;padding:8px 10px;font-size:13px;color:#8A2540}
+
+/* me */
+.profile{display:flex;align-items:center;gap:14px}
+.profile .avatar{width:56px;height:56px;font-size:22px}
+.menu{display:grid}
+.menu button,.menu a{display:flex;align-items:center;gap:12px;border:0;background:none;padding:13px 2px;border-bottom:1px solid var(--line);text-align:left;font-weight:600;text-decoration:none;color:var(--ink);min-height:48px}
+.menu > :last-child{border-bottom:0}
+.menu .chev{margin-left:auto;color:var(--muted)}
+.alarms div{display:grid;grid-template-columns:58px 1fr;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.alarms div:last-child{border-bottom:0}
+.alarms b{font-variant-numeric:tabular-nums}
+.danger{color:#B3263E!important}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:calc(var(--tab) + var(--safe) + 18px);transform:translate(-50%,20px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:999px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:20;white-space:nowrap}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+@media(prefers-reduced-motion:reduce){.toast,.bar i{transition:none}}
 </style>
 </head>
 <body>
-<header class="top"><div class="wrap">
-<h1>My Body Check</h1>
-<p class="sub">Your plan for today: water, skin, food and body. Plus checks for your products.</p>
-<div class="acct" id="acct"></div>
-<nav role="tablist" hidden>
-<button role="tab" data-tab="today" aria-selected="true">My plan</button>
-<button role="tab" data-tab="checkin" aria-selected="false">Check-in</button>
-<button role="tab" data-tab="products" aria-selected="false">Products</button>
-<button role="tab" data-tab="trends" aria-selected="false">Patterns</button>
-<button role="tab" data-tab="skin" aria-selected="false">Skin</button>
-<button role="tab" data-tab="gut" aria-selected="false">Gut</button>
-<button role="tab" data-tab="doctor" aria-selected="false">Doctor list</button>
-</nav></div></header>
+<div class="shell">
 
-<div class="band" id="loginBox" hidden><div class="card login">
-<h2 id="lTitle">Welcome back</h2><p class="hint" id="lSub">Log in to see your plan and check-ins on any phone.</p>
-<p class="pat" id="igNote" hidden>You are inside Instagram's browser. For Google login, tap <b>•••</b> → <b>Open in external browser</b>. Email login works here.</p>
-<button class="gbtn" type="button" id="gLogin"><svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>Continue with Google</button>
-<button class="gbtn" type="button" id="fLogin" style="margin-top:10px" hidden><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#1877F2"/><path fill="#fff" d="M13.4 19.5v-6h2l.3-2.4h-2.3V9.6c0-.7.2-1.1 1.2-1.1h1.2V6.3c-.2 0-1-.1-1.8-.1-1.8 0-3 1.1-3 3.1v1.8H9v2.4h2v6h2.4z"/></svg>Continue with Facebook</button>
-<p class="or">or with email</p>
-<form id="lForm" novalidate>
-<label id="nameRow" hidden>Your name<input type="text" id="lName" autocomplete="name" style="width:100%;font:16px Nunito,sans-serif;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;min-height:44px;margin-top:4px"></label>
-<label style="margin-top:10px">Email<input type="email" id="lEmail" autocomplete="email"></label>
-<label style="margin-top:10px">Password<input type="password" id="lPass" autocomplete="current-password"></label>
-<label id="pass2Row" style="margin-top:10px" hidden>Confirm password<input type="password" id="lPass2" autocomplete="new-password"></label>
-<p class="hint" id="passHint" hidden style="margin-top:6px">At least 6 characters.</p>
-<button class="btn" type="submit" id="lSubmit" style="margin-top:14px">Log in</button>
-</form>
-<p style="text-align:center;margin:8px 0 0" id="resetRow"><button class="link" type="button" id="lReset">Forgot password?</button></p>
-<div class="err" id="lErr" aria-live="polite"></div>
-<p style="text-align:center;margin:6px 0 0"><span class="hint" id="swText">New here?</span> <button class="link" type="button" id="lSwitch">Create an account</button></p>
-<p class="or">or</p>
-<button class="btn ghost" type="button" id="lGuest" style="width:100%">Use without an account (saved on this phone only)</button>
-<p class="note">By logging in you agree to the <button class="link" type="button" data-go="privacy" style="font-size:13px">privacy policy</button>. This app gives general wellness tips, not medical advice.</p>
-</div></div>
+<!-- splash while login is checked -->
+<div class="splash" id="boot" aria-label="Loading">
+ <svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="24" fill="none" stroke="#F0D5DF" stroke-width="7"/><circle cx="32" cy="32" r="24" fill="none" stroke="#A23D63" stroke-width="7" stroke-linecap="round" stroke-dasharray="40 151"/></svg>
+</div>
 
-<div class="band" id="boot" style="text-align:center;color:var(--soft)"><p>Loading…</p></div>
-<main id="app" hidden><div class="wrap">
-<section id="today">
-<div class="card" id="setup" hidden><h2>About me</h2><p class="hint">Fill this once. Your plan uses it.</p>
-<label>Body weight (kg)<input type="number" id="pWeight" min="30" max="200" inputmode="decimal"></label>
-<p class="zone">Breastfeeding now?</p><div class="chips" data-group="feed" data-single></div>
-<p class="zone">What do you want to improve?</p><div class="chips" data-group="concerns"></div>
-<button class="btn" type="button" id="pSave" style="margin-top:14px">Save my details</button></div>
-
-<div class="card"><h2>Water today</h2><div class="big" id="wTotal"></div><p id="wNow" style="font-weight:700;margin:6px 0"></p>
-<p class="hint">Tap a glass when you drink it.</p><div id="slots"></div></div>
-
-<div class="card"><h2>Sleep</h2>
-<p class="zone">I want to wake up at</p><div class="chips" data-group="wake" data-single></div>
-<div class="stats" style="margin-top:14px"><div class="stat"><b id="sWind">22:00</b><span>phone away, lights low</span></div><div class="stat"><b id="sBed">22:30</b><span>in bed, eyes closed</span></div><div class="stat"><b id="sWake">06:30</b><span>wake up</span></div></div>
-<p class="zone">Last night I slept</p><div class="chips" data-group="slept" data-single></div>
-<p class="zone">How was it?</p><div class="chips" data-group="sq" data-single></div>
-<p class="hint" id="sTip" style="margin-top:10px"></p></div>
-
-<div class="card"><h2>Set these reminders on your phone</h2><p class="hint">Do this once. Your phone will remind you every day, even when this app is closed.</p>
-<ul class="list" id="alarms"></ul>
-<p style="margin-top:10px"><button class="btn ghost" type="button" id="copyAl">Copy the list</button></p>
-<details style="margin-top:12px"><summary style="font-weight:700;cursor:pointer;min-height:44px">How to set them</summary>
-<p><b>iPhone:</b> open <b>Clock</b> → Alarm → + → choose the time → Repeat: every day → Label: the name above. For sleep, open <b>Clock</b> → Alarm → Sleep | Wake Up → Set Up, and turn on <b>Wind Down</b>.</p>
-<p><b>Android:</b> open <b>Clock</b> → Alarm → + → choose the time → tick all days → Label. For sleep, open <b>Clock</b> → <b>Bedtime</b> and set your bedtime and wake time.</p>
-<p class="hint">Tip: for water, choose a soft sound or vibration only.</p></details></div>
-
-<div class="card"><h2>Skincare today</h2><p class="hint" id="rType"></p>
-<h3>Morning</h3><ol class="steps" id="rAm"></ol><h3>Night</h3><ol class="steps" id="rPm"></ol></div>
-
-<div class="card"><h2>Food and body today</h2><ul class="list" id="habits"></ul></div>
-
-<div id="adv" hidden></div><div id="advOut" hidden></div>
-<p><button class="link" type="button" id="pEdit">Edit my details</button></p>
-<p class="note">This plan is general wellness guidance, not a medical prescription. For medicines or treatment, ask your doctor or pharmacist.</p>
+<!-- welcome / login / sign up -->
+<section class="auth" id="auth" hidden>
+ <div class="auth-art">
+  <svg class="rings" viewBox="0 0 200 200" aria-hidden="true">
+   <circle cx="100" cy="100" r="80" fill="none" stroke="#F3D9E3" stroke-width="18"/>
+   <path d="M100 20 A80 80 0 0 1 176 76" fill="none" stroke="#2A86AE" stroke-width="18" stroke-linecap="round"/>
+   <path d="M178 100 A80 80 0 0 1 124 176" fill="none" stroke="#D0668A" stroke-width="18" stroke-linecap="round"/>
+   <path d="M90 179 A80 80 0 0 1 26 130" fill="none" stroke="#3E8B5C" stroke-width="18" stroke-linecap="round"/>
+   <path d="M21 92 A80 80 0 0 1 60 31" fill="none" stroke="#3D55A3" stroke-width="18" stroke-linecap="round"/>
+  </svg>
+  <div class="brand"><i><svg width="18" height="18" viewBox="0 0 64 64"><circle cx="32" cy="32" r="18" fill="none" stroke="#fff" stroke-width="7" stroke-dasharray="23 5" stroke-linecap="round"/></svg></i>My Body Check</div>
+  <h1 id="aTitle">Your body, one gentle check a day</h1>
+  <p id="aSub">Water, skin, gut and sleep in one place, with a plan for today.</p>
+ </div>
+ <div class="auth-body">
+  <div class="seg" role="group" aria-label="Log in or sign up">
+   <button type="button" id="mLogin" aria-pressed="true">Log in</button>
+   <button type="button" id="mSignup" aria-pressed="false">Sign up</button>
+  </div>
+  <p class="ig" id="igNote" hidden>You're in Instagram's browser. For Google, tap ••• and choose <b>Open in external browser</b>. Email works here.</p>
+  <button class="gbtn" type="button" id="gLogin"><svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg><span id="gText">Continue with Google</span></button>
+  <div class="or">or with email</div>
+  <form class="form" id="aForm" novalidate>
+   <label class="field" id="nameRow" hidden>Your name<input id="aName" autocomplete="given-name"></label>
+   <label class="field">Email<input id="aEmail" type="email" autocomplete="email" inputmode="email"></label>
+   <label class="field">Password<input id="aPass" type="password" autocomplete="current-password"></label>
+   <label class="field" id="pass2Row" hidden>Confirm password<input id="aPass2" type="password" autocomplete="new-password"></label>
+   <p class="err" id="aErr" role="alert"></p>
+   <button class="btn" type="submit" id="aSubmit">Log in</button>
+  </form>
+  <div class="center" id="resetRow"><button class="link" type="button" id="aReset">Forgot password?</button></div>
+  <div class="center"><button class="link" type="button" id="aGuest" style="color:var(--muted)">Try without an account</button></div>
+  <p class="note center">By continuing you agree to the <button class="link" type="button" data-go="privacy" style="font-size:12.5px;min-height:0;padding:0">privacy policy</button>. General wellness tips, not medical advice.</p>
+ </div>
 </section>
 
-<section id="products" hidden>
-<div class="card"><h2>Add a product I use</h2><p class="hint">Add each cream, face wash or serum. Then tap how your skin reacts, day by day.</p>
-<label>Product name<input type="text" id="prodName" style="width:100%;font:16px Nunito,sans-serif;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;min-height:44px;margin-top:4px"></label>
-<label class="upl" style="margin-top:10px"><input type="file" id="prodPhoto" accept="image/*">Add a photo (optional)</label>
-<button class="btn" type="button" id="prodAdd" style="margin-top:10px">Add product</button><div id="prodMsg" class="hint" style="margin-top:10px" aria-live="polite"></div></div>
-<div class="card"><h2>My products</h2><p class="hint">After using a product, tap how your skin feels. One tap a day is enough.</p><div id="prodList"></div></div>
-</section>
+<!-- the app -->
+<div id="app" hidden>
+ <header class="top" id="top">
+  <div class="hello"><b id="hiName">Hello</b><span id="hiDate"></span></div>
+  <button class="avatar" type="button" id="avatarBtn" aria-label="Me"></button>
+ </header>
 
-<section id="checkin" hidden>
-<form id="f">
-<div class="card"><label for="date">Date</label><input type="date" id="date" required></div>
+ <main>
+ <!-- TODAY -->
+ <section class="view" id="v-today" data-view="today">
+  <div class="hero">
+   <div class="ring"><svg id="ring" viewBox="0 0 150 150" aria-hidden="true"></svg><div class="score"><b id="score">0</b><span>today's care</span></div></div>
+   <div class="legend" id="legend"></div>
+  </div>
+  <div class="next" id="next"></div>
 
-<div class="card"><h3>Skin photo</h3>
-<p class="hint">Take a clear photo of your face in daylight, no makeup, same place each time. Compare them in the Skin tab.</p>
-<label class="upl"><input type="file" id="photo" accept="image/*">Take or choose a photo</label>
-<div id="scanOut"></div></div>
+  <div class="card" id="c-water">
+   <div class="head"><span class="ico" style="background:#E4F1F7;color:var(--water)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5c3.3 4.2 6.5 8 6.5 11.5a6.5 6.5 0 0 1-13 0c0-3.5 3.2-7.3 6.5-11.5z"/></svg></span><h3>Water</h3><span class="sub" id="wText"></span></div>
+   <div class="drops" id="drops"></div>
+   <div class="spread"><span class="sub" id="wNext"></span><div class="stepper"><button type="button" id="wMinus" aria-label="Remove a glass">−</button><button class="btn small" type="button" id="wPlus" style="width:auto;height:44px">+ Glass</button></div></div>
+  </div>
 
-<div class="card"><h3>Skin meter</h3>
-<p class="hint">In the morning, after washing and before cream, touch the meter to two places and type the numbers.</p>
-<p class="zone">Cheek</p>
-<div class="row"><label>Moisture %<input type="number" id="moist" min="0" max="100" inputmode="decimal"></label>
-<label>Oil %<input type="number" id="oil" min="0" max="100" inputmode="decimal"></label></div>
-<p class="zone">Forehead or nose (T-zone)</p>
-<div class="row"><label>Moisture %<input type="number" id="tmoist" min="0" max="100" inputmode="decimal"></label>
-<label>Oil %<input type="number" id="toil" min="0" max="100" inputmode="decimal"></label></div></div>
+  <div class="card" id="c-skin">
+   <div class="head"><span class="ico" style="background:#FBE3EC;color:var(--skin)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><circle cx="9" cy="10.5" r="1" fill="currentColor"/><circle cx="15" cy="10.5" r="1" fill="currentColor"/><path d="M9 15c1.7 1.3 4.3 1.3 6 0" stroke-linecap="round"/></svg></span><h3>Skincare</h3><span class="sub" id="sType"></span></div>
+   <div class="seg sm" role="group"><button type="button" id="amBtn" aria-pressed="true">Morning</button><button type="button" id="pmBtn" aria-pressed="false">Night</button></div>
+   <div class="check" id="steps"></div>
+  </div>
 
-<div class="card"><h3>Acne</h3>
-<div class="slide"><input type="range" id="acne" min="0" max="5" value="0" aria-label="Acne level"><span class="val" id="acneV">0</span></div>
-<p class="hint" id="acneT">Clear skin</p>
-<div class="chips" data-group="areas"></div></div>
+  <div class="card" id="c-sleep">
+   <div class="head"><span class="ico" style="background:#E6EAF6;color:var(--sleep)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg></span><h3>Sleep</h3><span class="sub" id="slAvg"></span></div>
+   <div class="tiles" style="margin-bottom:12px"><div class="tile"><b id="slWind">22:00</b><span>phone away</span></div><div class="tile"><b id="slBed">22:30</b><span>in bed</span></div><div class="tile"><b id="slWake">6:30</b><span>wake up</span></div></div>
+   <p class="q">Last night I slept</p>
+   <div class="chips" id="slept"></div>
+  </div>
 
-<div class="card"><h3>Gut</h3>
-<p class="zone">Toilet today</p><div class="chips" data-group="poop" data-single></div>
-<p class="zone">Bloating or gas</p><div class="chips" data-group="bloat" data-single></div>
-<p class="zone">Fermented food today</p><div class="chips" data-group="ferm"></div>
-<div class="row" style="margin-top:12px"><label>Vegetable and fruit servings<input type="number" id="veg" min="0" max="15" inputmode="numeric"></label>
-<label>Sweets or sugary drinks<input type="number" id="sugar" min="0" max="15" inputmode="numeric"></label></div></div>
+  <div>
+   <h3 style="margin:6px 2px 10px">For you today</h3>
+   <div class="tips" id="tips"></div>
+  </div>
+ </section>
 
-<div class="card"><h3>Back pain</h3>
-<div class="slide"><input type="range" id="back" min="0" max="10" value="0" aria-label="Back pain"><span class="val" id="backV">0</span></div>
-<p class="hint">0 = no pain, 10 = worst pain</p></div>
+ <!-- LOG -->
+ <section class="view" id="v-log" data-view="log" hidden>
+  <div class="datebar"><button type="button" id="dPrev" aria-label="Previous day">‹</button><b id="dLabel">Today</b><button type="button" id="dNext" aria-label="Next day">›</button></div>
 
-<div class="card"><h3>Teeth</h3><div class="chips" data-group="teeth"></div></div>
-<div class="card"><h3>Hair fall</h3><div class="chips" data-group="hair" data-single></div></div>
+  <div class="sec">
+   <div class="head"><span class="ico" style="background:#FBE3EC;color:var(--skin)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><circle cx="9" cy="10.5" r="1" fill="currentColor"/><circle cx="15" cy="10.5" r="1" fill="currentColor"/></svg></span><h3>Skin</h3></div>
+   <p class="q">Acne today</p><div class="scale" id="acne" style="--c:var(--skin)"></div>
+   <p class="q">Where</p><div class="chips" id="areas" style="--c:var(--skin)"></div>
+   <p class="q">Face photo (optional)</p>
+   <div class="photo"><img id="phImg" alt="Today's face photo" hidden><label class="upl"><input type="file" accept="image/*" id="phIn">Add photo</label></div>
+   <details style="margin-top:10px"><summary>Skin meter numbers</summary>
+    <div class="grid2 mini" style="margin-top:8px">
+     <label class="field">Cheek moisture %<input type="number" id="moist" inputmode="decimal"></label>
+     <label class="field">Cheek oil %<input type="number" id="oil" inputmode="decimal"></label>
+     <label class="field">T-zone moisture %<input type="number" id="tmoist" inputmode="decimal"></label>
+     <label class="field">T-zone oil %<input type="number" id="toil" inputmode="decimal"></label>
+    </div></details>
+  </div>
 
-<div class="card"><h3>Energy, sleep and water</h3>
-<div class="slide"><input type="range" id="energy" min="1" max="5" value="3" aria-label="Energy"><span class="val" id="energyV">3/5</span></div>
-<div class="row"><label>Sleep (hours)<input type="number" id="sleep" min="0" max="16" step="0.5" inputmode="decimal"></label>
-<label>Water (glasses)<input type="number" id="water" min="0" max="20" inputmode="numeric"></label></div>
-<div class="chips" data-group="period"></div></div>
+  <div class="sec">
+   <div class="head"><span class="ico" style="background:#ECE8F7;color:var(--body)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="5" r="2.5"/><path d="M12 8v7m0 0-3 6m3-6 3 6M7 11h10"/></svg></span><h3>Body</h3></div>
+   <p class="q">Back pain</p><div class="scale" id="back" style="--c:var(--body)"></div>
+   <p class="q">Energy</p><div class="scale" id="energy" style="--c:var(--body);grid-template-columns:repeat(5,1fr)"></div>
+   <p class="q">Hair fall</p><div class="chips" id="hair" style="--c:var(--body)"></div>
+   <p class="q">Teeth</p><div class="chips" id="teeth" style="--c:var(--body)"></div>
+   <p class="q">Period</p><div class="chips" id="period" style="--c:var(--skin)"></div>
+  </div>
 
-<div class="card"><label for="notes">Notes</label><textarea id="notes" placeholder="Food, stress, new cream, anything you noticed"></textarea></div>
-<button class="btn" type="submit">Save today</button>
-<div class="msg" id="msg" aria-live="polite"></div>
-</form>
-</section>
+  <div class="sec">
+   <div class="head"><span class="ico" style="background:#E5F2EA;color:var(--gut)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 4c-3 0-4 3-2 5s6 1 7 4-2 5-5 5"/><path d="M16 4c2 0 3 2 2 4"/></svg></span><h3>Gut</h3></div>
+   <p class="q">Toilet</p><div class="chips" id="poop" style="--c:var(--gut)"></div>
+   <p class="q">Bloating</p><div class="chips" id="bloat" style="--c:var(--gut)"></div>
+   <p class="q">Fermented food</p><div class="chips" id="ferm" style="--c:var(--gut)"></div>
+   <div class="spread" style="margin-top:14px"><span class="q" style="margin:0">Vegetables and fruit</span><div class="stepper" data-k="veg"><button type="button" data-d="-1" aria-label="Less">−</button><output>0</output><button type="button" data-d="1" aria-label="More">+</button></div></div>
+   <div class="spread" style="margin-top:10px"><span class="q" style="margin:0">Sweets and sugary drinks</span><div class="stepper" data-k="sugar"><button type="button" data-d="-1" aria-label="Less">−</button><output>0</output><button type="button" data-d="1" aria-label="More">+</button></div></div>
+  </div>
 
-<section id="trends" hidden>
-<div class="card"><h2>Back pain and acne</h2>
-<div class="fig"><svg id="chart" role="img" aria-label="Back pain and acne over time"></svg></div>
-<div class="key"><span><i style="background:var(--rose)"></i>Back pain (0–10)</span><span><i style="background:var(--teal)"></i>Acne (0–5, shown ×2)</span></div></div>
-<div class="card"><h2>What I notice</h2><div id="pats"></div></div>
-<div class="card"><h2>All check-ins</h2><ul class="list" id="hist"></ul>
-<p style="margin-top:12px"><button class="btn ghost" id="copy" type="button">Copy all data</button></p>
-<p class="hint">Paste it into a note or show it to your doctor.</p></div>
-</section>
+  <div class="sec">
+   <div class="head"><h3>Note</h3></div>
+   <textarea id="note" placeholder="New cream, stress, food you noticed…"></textarea>
+  </div>
+  <div class="savebar"><button class="btn" type="button" id="saveLog">Save log</button></div>
+ </section>
 
-<section id="skin" hidden>
-<div class="card"><h2>My skin type</h2><p class="hint" id="skinFrom">From your latest meter reading</p>
-<div class="result" id="skinType">No reading yet</div><p id="skinTip"></p></div>
-<div class="card"><h2>Skin chart</h2>
-<div class="fig"><svg id="skinChart" role="img" aria-label="Skin moisture and oil over time"></svg></div>
-<div class="key"><span><i style="background:var(--teal)"></i>Cheek moisture %</span><span><i style="background:var(--rose)"></i>Cheek oil %</span><span><i style="background:var(--gold)"></i>T-zone oil %</span></div></div>
-<div class="card"><h2>Photo diary</h2><div class="photos" id="photos"></div></div>
-<div class="card"><h3>How skin type is read</h3><ul class="list">
-<li><span>Cheek moisture under 35%</span><b>Dry</b></li><li><span>Cheek moisture 35% or more, oil 30% or less</span><b>Normal</b></li>
-<li><span>Oil over 30% on both</span><b>Oily</b></li><li><span>T-zone oil over 30%, cheeks not oily</span><b>Combination</b></li>
-<li><span>Low moisture + high oil</span><b>Dehydrated oily</b></li></ul>
-<p class="note">A rough guide. Meters differ by brand, so compare your own numbers over weeks. A dermatologist (皮膚科) can tell you for sure.</p></div>
-</section>
+ <!-- SKIN -->
+ <section class="view" id="v-skin" data-view="skin" hidden>
+  <div class="skinhero"><span class="sub" id="skFrom">Your skin type</span><b id="skType">Not measured yet</b><p id="skTip" style="font-size:14px"></p></div>
+  <div class="card"><div class="head"><h3>Moisture and oil</h3></div><div class="fig"><svg id="skChart" role="img" aria-label="Skin moisture and oil over time"></svg></div>
+   <div class="key"><span><i style="background:var(--water)"></i>Cheek moisture</span><span><i style="background:var(--skin)"></i>Cheek oil</span><span><i style="background:#C98A1B"></i>T-zone oil</span></div></div>
+  <div class="card"><div class="head"><h3>Photo diary</h3><span class="sub">compare week by week</span></div><div class="photos" id="photos"></div></div>
+  <div class="card">
+   <div class="head"><h3>My products</h3></div>
+   <form class="row" id="pForm" style="gap:8px;margin-bottom:10px"><label class="field" style="flex:1"><input id="pName" placeholder="Product name, e.g. Hada Labo lotion" aria-label="Product name"></label><label class="upl" style="padding:0 14px" aria-label="Add product photo"><input type="file" accept="image/*" id="pPhoto">Photo</label></form>
+   <button class="btn soft" type="button" id="pAdd">Add product</button>
+   <p class="sub" style="margin-top:10px">After using a product, tap how your skin feels.</p>
+   <div id="prodList"></div>
+  </div>
+ </section>
 
-<section id="gut" hidden>
-<div class="card"><h2>My gut this week</h2><div class="stats" id="gutStats"></div><div id="gutPats" style="margin-top:12px"></div></div>
-<div class="card"><h2>Gentle ways to help your gut</h2><ul class="list">
-<li><span><b>Fermented food daily</b><br>Natto, miso soup, plain yogurt, kimchi or tsukemono. Easy to find at any supermarket in Japan.</span></li>
-<li><span><b>Fiber at every meal</b><br>Vegetables, seaweed, mushrooms, beans, brown rice, oats, banana, kiwi. Aim for 5+ servings a day.</span></li>
-<li><span><b>Water</b><br>6–8 glasses a day helps fiber work and keeps the toilet regular.</span></li>
-<li><span><b>Less sugar</b><br>Sweet drinks and snacks can feed the wrong gut bacteria and may make skin worse for some people.</span></li>
-<li><span><b>Sleep and walking</b><br>A 15-minute walk after meals and regular sleep help digestion.</span></li></ul>
-<p class="note">Some research links gut health and skin, but every body is different, so watch your own patterns here. If you have pain, blood in the stool, or toilet problems for weeks, see a doctor (消化器内科).</p></div>
-</section>
+ <!-- INSIGHTS -->
+ <section class="view" id="v-insights" data-view="insights" hidden>
+  <div class="card"><div class="head"><h3>Back pain and acne</h3><span class="sub">last 30 days</span></div><div class="fig"><svg id="mainChart" role="img" aria-label="Back pain and acne over time"></svg></div>
+   <div class="key"><span><i style="background:var(--body)"></i>Back pain (0–10)</span><span><i style="background:var(--skin)"></i>Acne (×2)</span></div></div>
+  <div class="card"><div class="head"><h3>What we notice</h3></div><div id="pats"></div></div>
+  <div class="card"><div class="head"><span class="dot" style="background:var(--gut)"></span><h3>Gut this week</h3></div><div class="tiles" id="gutTiles"></div></div>
+  <div class="card"><div class="head"><h3>History</h3><button class="link" type="button" id="copyAll">Copy for doctor</button></div><div class="hist" id="hist"></div></div>
+ </section>
 
-<section id="doctor" hidden>
-<div class="card"><h2>Things to check</h2><p class="hint">Tick each one when it's done.</p><ul class="list check" id="checks"></ul></div>
-<p class="note">This app helps you track and notice patterns. It does not diagnose. For pain that gets worse, numbness in your legs, or anything that worries you, see a doctor soon.</p>
-</section>
-<section id="admin" hidden>
-<div class="card"><h2>Dashboard</h2><p class="hint" id="aWhen">Loading…</p><div class="stats" id="aStats"></div></div>
-<div class="card"><h2>Last 30 days</h2><div class="fig"><svg id="aChart" role="img" aria-label="Active users and new sign-ups per day"></svg></div>
-<div class="key"><span><i style="background:var(--teal)"></i>People who opened the app</span><span><i style="background:var(--rose)"></i>New accounts</span></div></div>
-<div class="card"><p class="hint"><b>Accounts</b> = people who logged in with Google or email. <b>Guests</b> = people using it without an account. <b>Active</b> = opened the app that day. Only dates are counted, never anyone's health data.</p>
-<button class="btn ghost" type="button" id="aRefresh">Refresh</button></div>
-</section>
-<section id="privacy" hidden>
-<div class="card"><h2>Privacy policy</h2>
-<p><b>What is saved:</b> your email (if you log in), and only what you enter: check-ins, photos, products, your weight and settings.</p>
-<p><b>Where:</b> if you log in, in a secure Google Firebase database. If you use the app without an account, only on your phone.</p>
-<p><b>Why:</b> only to show you your own plan, history and patterns.</p>
-<p><b>Who can see it:</b> only you. Your data is never sold or shared with anyone. The app owner can technically access the database to fix problems, but will never look at your data or share it, unless the law requires it.</p>
-<p><b>Usage counts:</b> to improve the app, it counts which days the app was opened and when an account was made or deleted. This count has no name, email or health data.</p>
-<p><b>Your control:</b> you can delete everything at any time with the button below. It removes your data and your account.</p>
-<p><b>Health:</b> this app gives general wellness tips. It does not diagnose or treat any illness. Always ask a doctor about medical problems.</p>
-<p><b>Contact:</b> send a message to the Instagram account that shared this app.</p>
-<button class="btn ghost" type="button" id="delAcc" style="margin-top:8px">Delete my account and data</button><div class="err" id="delMsg"></div></div>
-</section>
-<div class="foot"><button class="link" type="button" data-go="privacy">Privacy policy</button></div>
-<p class="sync" id="sync">Your data stays on this phone. Nobody else can see it.</p>
-</div></main>
+ <!-- ME -->
+ <section class="view" id="v-me" data-view="me" hidden>
+  <div class="card profile"><span class="avatar" id="meAv"></span><div><h3 id="meName">You</h3><p class="sub" id="meEmail"></p></div></div>
+
+  <div class="card">
+   <div class="head"><h3>About me</h3></div>
+   <div class="form">
+    <label class="field">Body weight (kg)<input type="number" id="pW" inputmode="decimal"></label>
+    <p class="q" style="margin:4px 0 0">Breastfeeding now?</p><div class="chips" id="feed"></div>
+    <p class="q" style="margin:4px 0 0">I want to improve</p><div class="chips" id="concerns"></div>
+    <p class="q" style="margin:4px 0 0">I wake up at</p><div class="chips" id="wake" style="--c:var(--sleep)"></div>
+    <button class="btn" type="button" id="pSave" style="margin-top:6px">Save</button>
+   </div>
+  </div>
+
+  <div class="card">
+   <div class="head"><h3>Phone reminders</h3><button class="link" type="button" id="copyAl">Copy</button></div>
+   <div class="alarms" id="alarms"></div>
+   <details style="margin-top:8px"><summary>How to set them</summary><p class="sub" style="margin:6px 0">iPhone: Clock → Alarm → + → pick the time → Repeat every day → add the label. For sleep, Clock → Sleep | Wake Up → turn on Wind Down.</p><p class="sub">Android: Clock → Alarm → + → pick the time → tick every day → Label. For sleep, Clock → Bedtime.</p></details>
+  </div>
+
+  <div class="card"><div class="head"><h3>Doctor list</h3></div><div class="check" id="doc"></div></div>
+
+  <div class="card menu">
+   <button type="button" id="toAdmin" hidden>Dashboard<span class="chev">›</span></button>
+   <button type="button" data-go="privacy">Privacy policy<span class="chev">›</span></button>
+   <button type="button" id="logout">Log out<span class="chev">›</span></button>
+  </div>
+  <p class="note center">General wellness tips, not medical advice. For pain that gets worse or anything that worries you, see a doctor.</p>
+ </section>
+
+ <!-- DASHBOARD (owner only) -->
+ <section class="view" id="v-admin" data-view="admin" hidden>
+  <div class="row"><button class="link" type="button" data-back>‹ Back</button></div>
+  <div class="card"><div class="head"><h3>Dashboard</h3><span class="sub" id="aWhen"></span></div><div class="tiles" id="aStats"></div></div>
+  <div class="card"><div class="head"><h3>Last 30 days</h3></div><div class="fig"><svg id="aChart" role="img" aria-label="Active users and new accounts per day"></svg></div>
+   <div class="key"><span><i style="background:var(--water)"></i>Opened the app</span><span><i style="background:var(--berry)"></i>New accounts</span></div></div>
+  <p class="note">Only dates are counted, never anyone's health data.</p>
+ </section>
+
+ <!-- PRIVACY -->
+ <section class="view" id="v-privacy" data-view="privacy" hidden>
+  <div class="row"><button class="link" type="button" data-back>‹ Back</button></div>
+  <div class="card" style="display:grid;gap:10px;font-size:14px">
+   <h2>Privacy policy</h2>
+   <p><b>What is saved:</b> your email if you log in, and only what you enter: check-ins, photos, products, weight and settings.</p>
+   <p><b>Where:</b> with an account, in a secure Google Firebase database. Without an account, only on your phone.</p>
+   <p><b>Why:</b> only to show you your own plan, history and patterns.</p>
+   <p><b>Who can see it:</b> only you. Your data is never sold or shared. The app owner can technically reach the database to fix problems, but will not look at or share your data unless the law requires it.</p>
+   <p><b>Usage counts:</b> the app counts which days it was opened and when accounts are made or deleted, with no name, email or health data.</p>
+   <p><b>Your control:</b> delete everything at any time with the button below.</p>
+   <p><b>Health:</b> general wellness tips only. It does not diagnose or treat illness.</p>
+   <p><b>Contact:</b> mybodycheck.app@gmail.com</p>
+   <button class="btn soft danger" type="button" id="delAcc" style="margin-top:6px">Delete my account and data</button><p class="err" id="delMsg"></p>
+  </div>
+ </section>
+ </main>
+
+ <nav class="tabbar" aria-label="Main">
+  <button type="button" data-tab="today" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5" stroke-dasharray="11 2.4"/></svg>Today</button>
+  <button type="button" data-tab="log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="5"/><path d="M12 8.5v7M8.5 12h7"/></svg>Log</button>
+  <button type="button" data-tab="skin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><circle cx="9" cy="10.5" r="1" fill="currentColor"/><circle cx="15" cy="10.5" r="1" fill="currentColor"/><path d="M9 15c1.7 1.3 4.3 1.3 6 0" stroke-linecap="round"/></svg>Skin</button>
+  <button type="button" data-tab="insights"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18l5-6 4 3 7-9"/></svg>Insights</button>
+  <button type="button" data-tab="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c1.3-3.6 4.2-5.2 7.5-5.2s6.2 1.6 7.5 5.2"/></svg>Me</button>
+ </nav>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+</div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
-/* ===== PASTE YOUR FIREBASE SETTINGS HERE ===== */
 const FIREBASE_CONFIG={apiKey:"AIzaSyDuf1IFpqPzOLH-r7KktfCnmFlBrT2DrEs",authDomain:"mybodycheck-650a4.firebaseapp.com",projectId:"mybodycheck-650a4",storageBucket:"mybodycheck-650a4.firebasestorage.app",messagingSenderId:"600201093124",appId:"1:600201093124:web:4a2d0507a7b681b9949551"};
-/* Your own User UID (Firebase > Authentication > Users). Only this account sees the Dashboard. */
 const ADMIN_UID="QAILuA8ieAP3LJ7aVcugiDadRhM2";
-/* Turn on after Facebook login is set up in Firebase: true */
-const FACEBOOK_ON=false;
 </script>
 <script>
 {
-const $=s=>document.querySelector(s);
-const AREAS=['Cheeks','Jaw','Chin','Forehead','Nose'],TEETH=['Sensitive','Gums bleed','Tooth pain','Fine'],HAIR=['Low','Normal','High','Very high'],PERIOD=['On my period today'];
-const POOP=['None','Hard','Normal','Loose'],BLOAT=['No','A little','A lot'],FERM=['Natto','Miso','Yogurt','Kimchi','Tsukemono'];
-const ACNE=['Clear skin','A few spots','Some spots','Many spots','Lots, painful','Very bad, swollen'];
-const CHECKS=[
-['blood','Blood test: vitamin D, calcium, iron (ferritin), B12, thyroid (TSH)'],
-['ortho','Back: orthopedic clinic (整形外科) or physiotherapist'],
-['dr','Ask about stomach muscle gap after pregnancy (diastasis recti)'],
-['derm','Skin: dermatologist (皮膚科) about cheek and jaw acne, ask about hormones'],
-['dent','Teeth: dentist (歯科) check-up'],
-['gutdr','Gut: if toilet problems last for weeks, internal medicine (消化器内科)'],
-['show','Show this app\'s history to each doctor']];
-let profile={},products={},entries={},checks={},photos={},db=null,uid=null,first=false,sample=null,scan=null,thumb=null;
-const today=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+const dstr=d=>new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10);
+const today=()=>dstr(new Date());
+const shift=(s,n)=>{const d=new Date(s+'T12:00:00');d.setDate(d.getDate()+n);return dstr(d)};
+const avg=(a,f)=>{const v=a.map(f).filter(x=>x!=null&&!Number.isNaN(x));return v.length?v.reduce((s,x)=>s+x,0)/v.length:null};
+let toastT;function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('on'),2000)}
 
-function chips(group,items){const el=document.querySelector(`[data-group=${group}]`);
- el.innerHTML=items.map(t=>`<button type="button" class="chip" aria-pressed="false">${t}</button>`).join('');
- el.addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;
-  if(el.hasAttribute('data-single'))el.querySelectorAll('.chip').forEach(c=>c!==b&&c.setAttribute('aria-pressed','false'));
-  b.setAttribute('aria-pressed',b.getAttribute('aria-pressed')==='true'?'false':'true')})}
-[['areas',AREAS],['teeth',TEETH],['hair',HAIR],['period',PERIOD],['poop',POOP],['bloat',BLOAT],['ferm',FERM],['feed',['Yes','No']],['wake',['5:30','6:00','6:30','7:00','7:30','8:00']],['slept',['Under 5h','5–6h','6–7h','7–8h','8h+']],['sq',['Woke up a lot','OK','Deep sleep']],['concerns',['Acne','Dry skin','Back pain','Hair fall','Teeth','Tummy','Tiredness']]].forEach(([g,i])=>chips(g,i));
-const picked=g=>[...document.querySelectorAll(`[data-group=${g}] .chip[aria-pressed=true]`)].map(b=>b.textContent);
-const setPicked=(g,v)=>document.querySelectorAll(`[data-group=${g}] .chip`).forEach(b=>b.setAttribute('aria-pressed',(v||[]).includes(b.textContent)?'true':'false'));
-
-const sl=[['acne',v=>{$('#acneV').textContent=v;$('#acneT').textContent=ACNE[v]}],['back',v=>$('#backV').textContent=v],['energy',v=>$('#energyV').textContent=v+'/5']];
-sl.forEach(([id,fn])=>{$('#'+id).addEventListener('input',e=>fn(e.target.value));fn($('#'+id).value)});
-const NUMS=['moist','oil','tmoist','toil','veg','sugar','sleep','water'];
-
-function fill(d){const e=entries[d]||{};
- NUMS.forEach(k=>$('#'+k).value=e[k]??'');$('#acne').value=e.acne??0;$('#back').value=e.back??0;$('#energy').value=e.energy??3;$('#notes').value=e.notes||'';
- setPicked('areas',e.areas);setPicked('teeth',e.teeth);setPicked('hair',e.hair?[e.hair]:[]);setPicked('period',e.period?[PERIOD[0]]:[]);
- setPicked('poop',e.poop?[e.poop]:[]);setPicked('bloat',e.bloat?[e.bloat]:[]);setPicked('ferm',e.ferm);
- scan=e.scan||null;thumb=photos[d]||null;showScan();sl.forEach(([id,fn])=>fn($('#'+id).value))}
-$('#date').value=today();$('#date').addEventListener('change',e=>fill(e.target.value));
-
-const num=v=>v===''?null:Number(v);
+/* ---------- state ---------- */
+let profile={},products={},entries={},checks={},photos={};
+let auth=null,db=null,uid=null,user=null,unsub=null,first=false,guest=false,triedAnon=false;
+try{guest=localStorage.getItem('bc-guest')==='1';profile=JSON.parse(localStorage.getItem('bc-profile')||'{}');products=JSON.parse(localStorage.getItem('bc-products')||'{}');entries=JSON.parse(localStorage.getItem('bc-entries')||'{}');checks=JSON.parse(localStorage.getItem('bc-checks')||'{}');photos=JSON.parse(localStorage.getItem('bc-photos')||'{}')}catch(e){}
+function localSave(){try{localStorage.setItem('bc-profile',JSON.stringify(profile));localStorage.setItem('bc-products',JSON.stringify(products));localStorage.setItem('bc-entries',JSON.stringify(entries));localStorage.setItem('bc-checks',JSON.stringify(checks));const pp={};Object.keys(photos).sort().slice(-30).forEach(k=>pp[k]=photos[k]);localStorage.setItem('bc-photos',JSON.stringify(pp))}catch(e){}}
 const store=()=>db&&uid?db.collection('data/users/'+uid):null;
-$('#f').addEventListener('submit',async e=>{e.preventDefault();const d=$('#date').value;if(!d)return;
- const rec={date:d,acne:+$('#acne').value,areas:picked('areas'),back:+$('#back').value,teeth:picked('teeth'),hair:picked('hair')[0]||null,
-  energy:+$('#energy').value,period:picked('period').length>0,poop:picked('poop')[0]||null,bloat:picked('bloat')[0]||null,ferm:picked('ferm'),
-  notes:$('#notes').value.trim(),scan:scan||null};
- NUMS.forEach(k=>rec[k]=num($('#'+k).value));
- entries[d]=rec;if(thumb)photos[d]=thumb;localSave();render();
- $('#msg').textContent='Saved. Well done for checking in today.';
- const c=store();if(c){try{await c.doc('e-'+d).set(rec);if(thumb)await c.doc('p-'+d).set({date:d,img:thumb});$('#sync').textContent='Saved to your account'}catch(err){$('#sync').textContent='Saved on this phone only'}}});
-
-function localSave(){try{localStorage.setItem('bc-profile',JSON.stringify(profile));localStorage.setItem('bc-products',JSON.stringify(products));localStorage.setItem('bc-entries',JSON.stringify(entries));localStorage.setItem('bc-checks',JSON.stringify(checks));const ks=Object.keys(photos).sort().slice(-30),pp={};ks.forEach(k=>pp[k]=photos[k]);localStorage.setItem('bc-photos',JSON.stringify(pp))}catch(e){}}
-try{profile=JSON.parse(localStorage.getItem('bc-profile')||'{}');products=JSON.parse(localStorage.getItem('bc-products')||'{}');entries=JSON.parse(localStorage.getItem('bc-entries')||'{}');checks=JSON.parse(localStorage.getItem('bc-checks')||'{}');photos=JSON.parse(localStorage.getItem('bc-photos')||'{}')}catch(e){}
-
-/* photo scan */
-function shrink(file,max,q){return new Promise((res,rej)=>{const img=new Image();img.onload=()=>{const k=Math.min(1,max/Math.max(img.width,img.height));
- const c=document.createElement('canvas');c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);c.getContext('2d').drawImage(img,0,0,c.width,c.height);
- URL.revokeObjectURL(img.src);c.toBlob(b=>b?res({blob:b,url:c.toDataURL('image/jpeg',q)}):rej(),'image/jpeg',q)};img.onerror=rej;img.src=URL.createObjectURL(file)})}
-function showScan(text){const o=$('#scanOut');if(text){o.innerHTML=`<p class="hint" style="margin-top:12px">${text}</p>`;return}
- if(!thumb&&!scan){o.innerHTML='';return}
- o.innerHTML=`<div class="scan">${thumb?`<img src="${thumb}" alt="Your skin photo">`:'<span></span>'}<div>${scan?`<b>${esc(scan.summary)}</b><p class="hint" style="margin:6px 0">Spots: ${esc(scan.spots)} · Redness: ${esc(scan.redness)}${scan.areas?.length?' · Where: '+esc(scan.areas.join(', ')):''}</p><p style="margin:0">${esc(scan.tip)}</p>`:'<p class="hint">Photo ready. Press Save today to keep it.</p>'}</div></div>`}
-$('#photo').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;
- try{showScan('Reading your photo…');const big=await shrink(f,900,.8),sm=await shrink(f,320,.6);thumb=sm.url;scan=null;
-  if(!sample){showScan();$('#msg').textContent='Photo added. Press Save today.';return}
-  showScan('Looking at your skin… this takes a few seconds.');
-  const r=await sample.json(`You are a careful skincare helper inside a personal skin diary app. Look at this face photo. Do NOT diagnose any disease. Describe only what is visible, in very simple English for a non-native reader. Return ONLY JSON: {"spots":"none|few|some|many","redness":"none|mild|moderate|strong","areas":["cheeks"|"jaw"|"chin"|"forehead"|"nose"],"acne_level":0-5,"summary":"one short sentence about what you see","tip":"one short gentle skincare tip based on what you see"}. If the photo is not a face or is too blurry, set summary to say so and acne_level to 0.`,{images:[big.blob],modelTier:'default'});
-  scan={spots:r.spots,redness:r.redness,areas:Array.isArray(r.areas)?r.areas:[],summary:r.summary,tip:r.tip,level:r.acne_level};
-  if(Number.isFinite(+r.acne_level)){$('#acne').value=Math.max(0,Math.min(5,Math.round(+r.acne_level)));sl[0][1]($('#acne').value)}
-  const map={cheeks:'Cheeks',jaw:'Jaw',chin:'Chin',forehead:'Forehead',nose:'Nose'};setPicked('areas',scan.areas.map(a=>map[a]).filter(Boolean));
-  showScan();$('#msg').textContent='Scan done. Check the acne level, then press Save today.'}
- catch(err){showScan(err&&err.code==='rate_limited'?'Too many scans right now. Try again in a little while.':'Could not scan this photo. You can still fill in acne by hand.')}
- e.target.value=''});
-
-function skinType(e){const m=e.moist,o=e.oil,tm=e.tmoist,to=e.toil;if(m==null&&o==null&&to==null)return null;
- const cOily=o!=null&&o>30,tOily=to!=null&&to>30,cDry=m!=null&&m<35;
- if(tOily&&!cOily)return['Combination','Oily forehead and nose, normal or dry cheeks. Use a gentle cleanser, light gel moisturiser on the T-zone and a richer cream on the cheeks.'];
- if(cOily&&cDry)return['Dehydrated oily','Your skin makes oil but lacks water. Use a light, oil-free moisturiser and gentle cleanser; avoid harsh scrubs.'];
- if(cOily)return['Oily','Use a gentle foaming cleanser and light gel moisturiser. Oily skin is more likely to get acne on cheeks and chin.'];
- if(cDry)return['Dry','Use a creamy cleanser and a richer moisturiser. Drink water and avoid very hot showers.'];
- return['Normal','Your skin is balanced. Keep a simple routine: gentle wash, moisturiser, sunscreen.'+(to==null?' Add a T-zone reading to check for combination skin.':'')]}
-
-function avg(a,f){const v=a.map(f).filter(x=>x!=null&&!Number.isNaN(x));return v.length?v.reduce((s,x)=>s+x,0)/v.length:null}
+async function put(id,obj){const c=store();if(!c)return;try{await c.doc(id).set(obj)}catch(e){toast('Saved on this phone. Will sync later.')}}
+async function saveEntry(d,patch){entries[d]={date:d,...(entries[d]||{}),...patch};localSave();renderAll();await put('e-'+d,entries[d])}
 const sorted=()=>Object.values(entries).sort((a,b)=>a.date<b.date?-1:1);
 
-function render(){const list=sorted().reverse();
- $('#hist').innerHTML=list.length?list.map(e=>`<li><span><b>${e.date}</b><br>Back ${e.back??'–'}/10 · Acne ${e.acne??'–'}/5${e.areas?.length?' ('+e.areas.join(', ')+')':''}${e.poop?' · Toilet '+e.poop.toLowerCase():''}${e.hair?' · Hair fall '+e.hair.toLowerCase():''}${e.notes?'<br><span class="hint">'+esc(e.notes)+'</span>':''}</span><button class="del" data-d="${e.date}" type="button">Delete</button></li>`).join(''):'<li>No check-ins yet. Start on the Today tab.</li>';
- const last=list.find(e=>e.moist!=null||e.oil!=null||e.toil!=null),st=last&&skinType(last);
- $('#skinType').textContent=st?st[0]:'No reading yet';$('#skinTip').textContent=st?st[1]:'Add your meter numbers on the Today tab.';
- $('#skinFrom').textContent=last?`From ${last.date}: cheek ${last.moist??'–'}% moisture / ${last.oil??'–'}% oil, T-zone ${last.tmoist??'–'}% / ${last.toil??'–'}%`:'From your latest meter reading';
- const ph=Object.keys(photos).sort().reverse();
- $('#photos').innerHTML=ph.length?ph.map(d=>`<figure><img src="${photos[d]}" alt="Skin photo ${d}"><figcaption>${d.slice(5)}</figcaption></figure>`).join(''):'<p class="hint">Your skin photos appear here, so you can see changes week by week.</p>';
- const asc=list.slice().reverse();pats(asc);gut(asc);drawAll();plan();sleepPlan();renderProducts();
- $('#checks').innerHTML=CHECKS.map(([k,t])=>`<li><input type="checkbox" id="c-${k}" data-k="${k}" ${checks[k]?'checked':''}><label for="c-${k}" style="font-weight:400">${t}</label></li>`).join('')}
+/* ---------- screens ---------- */
+function chrome(on){$('.tabbar').hidden=!on;$('#top').hidden=!on}
+function screen(name){chrome(true);$('#boot').hidden=name!=='boot';$('#auth').hidden=name!=='auth';$('#app').hidden=name!=='app'}
+let view='today';
+function go(v){view=v;$$('main .view').forEach(s=>s.hidden=s.dataset.view!==v);
+ $$('.tabbar button').forEach(b=>b.dataset.tab===v?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
+ window.scrollTo(0,0);if(v==='log')fillLog();if(v==='admin')loadAdmin();drawCharts()}
+$('.tabbar').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(b)go(b.dataset.tab)});
+$('#avatarBtn').addEventListener('click',()=>go('me'));
+let backTo='me';
+document.addEventListener('click',e=>{const p=e.target.closest('[data-go=privacy]');if(p){if(!$('#auth').hidden){backTo='auth';screen('app');chrome(false)}else backTo=view;go('privacy');return}
+ if(e.target.closest('[data-back]')){if(backTo==='auth'&&!user&&!guest){screen('auth')}else go(view==='admin'?'me':backTo)}});
+addEventListener('scroll',()=>$('#top').classList.toggle('scrolled',scrollY>4),{passive:true});
 
-function pats(a){const out=[];
- if(a.length<3){$('#pats').innerHTML='<p class="hint">After 3 or more check-ins, patterns will show here.</p>';return}
- const r=a.slice(-7),p=a.slice(-14,-7);const b1=avg(r,e=>e.back),b0=avg(p,e=>e.back);
- out.push(`Average back pain, last ${r.length} check-ins: <b>${b1.toFixed(1)}/10</b>`+(b0!=null?` (before: ${b0.toFixed(1)})`:''));
- const on=a.filter(e=>e.period),off=a.filter(e=>!e.period);
- if(on.length&&off.length){const x=avg(on,e=>e.acne),y=avg(off,e=>e.acne);out.push(`Acne on period days: <b>${x.toFixed(1)}/5</b>, other days: <b>${y.toFixed(1)}/5</b>.`+(x-y>=1?' Your acne may follow your cycle. Mention this to the dermatologist.':''))}
- const s7=a.filter(e=>e.sleep!=null&&e.sleep<6),s8=a.filter(e=>e.sleep!=null&&e.sleep>=6);
- if(s7.length&&s8.length){const x=avg(s7,e=>e.back),y=avg(s8,e=>e.back);if(x-y>=1)out.push(`Back pain is higher after short sleep: <b>${x.toFixed(1)}</b> vs <b>${y.toFixed(1)}</b>.`)}
- const ar={};a.forEach(e=>(e.areas||[]).forEach(z=>ar[z]=(ar[z]||0)+1));const top=Object.entries(ar).sort((x,y)=>y[1]-x[1])[0];
- if(top)out.push(`Acne shows most often on: <b>${top[0].toLowerCase()}</b> (${top[1]} days).`);
- const lowE=a.filter(e=>e.energy<=2).length;if(lowE>=Math.ceil(a.length/2))out.push('You feel low energy on many days. A blood test for iron, vitamin D, B12 and thyroid can help find why.');
- $('#pats').innerHTML=out.map(t=>`<div class="pat">${t}</div>`).join('')}
+/* ---------- chips & scales ---------- */
+function chips(id,items,single){const el=$('#'+id);el.innerHTML=items.map(t=>`<button type="button" class="chip" aria-pressed="false">${t}</button>`).join('');
+ el.addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;const on=b.getAttribute('aria-pressed')!=='true';if(single)el.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed',on);el.dispatchEvent(new Event('change'))})}
+const picked=id=>$$('#'+id+' .chip[aria-pressed=true]').map(b=>b.textContent);
+const setPicked=(id,v)=>$$('#'+id+' .chip').forEach(b=>b.setAttribute('aria-pressed',(v||[]).includes(b.textContent)));
+function scale(id,opts){const el=$('#'+id);el.innerHTML=opts.map(([v,n,l])=>`<button type="button" data-v="${v}" aria-pressed="false"><b>${n}</b>${l}</button>`).join('');
+ el.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const on=b.getAttribute('aria-pressed')!=='true';el.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed',on)})}
+const scaleVal=id=>{const b=$('#'+id+' button[aria-pressed=true]');return b?+b.dataset.v:null};
+const setScale=(id,v)=>$$('#'+id+' button').forEach(b=>b.setAttribute('aria-pressed',v!=null&&+b.dataset.v===v));
+scale('acne',[[0,0,'Clear'],[1,1,'Few'],[2,2,'Some'],[3,3,'Many'],[4,4,'Lots'],[5,5,'Severe']]);
+scale('back',[[0,0,'None'],[2,2,'Mild'],[4,4,'Medium'],[6,6,'Strong'],[8,8,'Severe'],[10,10,'Worst']]);
+scale('energy',[[1,1,'Very low'],[2,2,'Low'],[3,3,'OK'],[4,4,'Good'],[5,5,'Great']]);
+chips('areas',['Cheeks','Jaw','Chin','Forehead','Nose']);chips('hair',['Low','Normal','High','Very high'],1);chips('teeth',['Fine','Sensitive','Gums bleed','Tooth pain']);
+chips('period',['On my period']);chips('poop',['None','Hard','Normal','Loose'],1);chips('bloat',['No','A little','A lot'],1);chips('ferm',['Natto','Miso','Yogurt','Kimchi','Tsukemono']);
+chips('feed',['Yes','No'],1);chips('concerns',['Acne','Dry skin','Back pain','Hair fall','Teeth','Tummy','Tiredness']);chips('wake',['5:30','6:00','6:30','7:00','7:30','8:00'],1);chips('slept',['Under 5h','5–6h','6–7h','7–8h','8h+'],1);
+$$('.stepper[data-k]').forEach(s=>s.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const o=s.querySelector('output');o.value=o.textContent=Math.max(0,Math.min(15,(+o.textContent||0)+ +b.dataset.d))}));
 
-function gut(a){const w=a.slice(-7),n=w.length||1;
- const reg=w.filter(e=>e.poop==='Normal').length,fer=w.filter(e=>e.ferm?.length).length,veg=avg(w,e=>e.veg);
- $('#gutStats').innerHTML=`<div class="stat"><b>${reg}/${w.length}</b><span>days with normal toilet</span></div><div class="stat"><b>${fer}/${w.length}</b><span>days with fermented food</span></div><div class="stat"><b>${veg==null?'–':veg.toFixed(1)}</b><span>veg and fruit a day</span></div>`;
- const out=[];
- if(a.length>=3){const bad=a.filter(e=>e.poop==='Hard'||e.poop==='None'||e.bloat==='A lot'),good=a.filter(e=>e.poop==='Normal'&&e.bloat!=='A lot');
-  if(bad.length&&good.length){const x=avg(bad,e=>e.acne),y=avg(good,e=>e.acne);out.push(`Acne on difficult gut days: <b>${x.toFixed(1)}/5</b>, on good gut days: <b>${y.toFixed(1)}/5</b>.`+(x-y>=1?' Your skin may react to your gut. Focus on fiber, water and fermented food.':''))}
-  const hi=a.filter(e=>e.sugar!=null&&e.sugar>=3),lo=a.filter(e=>e.sugar!=null&&e.sugar<3);
-  if(hi.length&&lo.length){const x=avg(hi,e=>e.acne),y=avg(lo,e=>e.acne);if(x-y>=1)out.push(`Acne is higher on high-sugar days: <b>${x.toFixed(1)}</b> vs <b>${y.toFixed(1)}</b>.`)}}
- if(w.length&&veg!=null&&veg<5)out.push('Try to reach 5 servings of vegetables and fruit a day. Add one more at dinner this week.');
- if(w.length&&fer<4)out.push('Add one fermented food a day, like natto or miso soup.');
- $('#gutPats').innerHTML=w.length?out.map(t=>`<div class="pat">${t}</div>`).join(''):'<p class="hint">Fill in the Gut card on the Today tab to see your week here.</p>'}
-
-function chart(svg,a,series,max,ticks){const W=svg.clientWidth,H=svg.clientHeight;if(!W)return;
- const L=30,R=12,T=12,B=28,iw=W-L-R,ih=H-T-B;
- const pts=series.map(s=>({c:s.c,p:a.map((e,i)=>[i,s.f(e)]).filter(([,v])=>v!=null)}));
- if(a.length<2||!pts.some(s=>s.p.length>=2)){svg.innerHTML=`<text x="${W/2}" y="${H/2}" text-anchor="middle" fill="var(--soft)" font-size="15">Your chart appears after 2 check-ins</text>`;return}
- const x=i=>L+i*iw/(a.length-1),y=v=>T+ih-Math.min(v,max)/max*ih;let g='';
- ticks.forEach(v=>g+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="12" fill="var(--soft)">${v}</text>`);
- (W<520?[0,a.length-1]:[0,Math.floor((a.length-1)/2),a.length-1]).forEach(i=>g+=`<text x="${x(i)}" y="${H-8}" text-anchor="${i===0?'start':i===a.length-1?'end':'middle'}" font-size="12" fill="var(--soft)">${a[i].date.slice(5)}</text>`);
- pts.forEach(s=>{if(s.p.length<1)return;g+=`<polyline fill="none" stroke="${s.c}" stroke-width="3" stroke-linejoin="round" points="${s.p.map(([i,v])=>x(i)+','+y(v)).join(' ')}"/>`+s.p.map(([i,v])=>`<circle cx="${x(i)}" cy="${y(v)}" r="3.5" fill="${s.c}"/>`).join('')});
- svg.innerHTML=g}
-function drawAll(){const a=sorted().slice(-30);
- chart($('#chart'),a,[{f:e=>e.back,c:'var(--rose)'},{f:e=>e.acne==null?null:e.acne*2,c:'var(--teal)'}],10,[0,5,10]);
- const s=a.filter(e=>e.moist!=null||e.oil!=null||e.toil!=null);
- chart($('#skinChart'),s,[{f:e=>e.moist,c:'var(--teal)'},{f:e=>e.oil,c:'var(--rose)'},{f:e=>e.toil,c:'var(--gold)'}],80,[0,20,40,60,80])}
-const ro=new ResizeObserver(drawAll);ro.observe($('#chart'));ro.observe($('#skinChart'));
-
-document.querySelector('nav').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(!b)return;
- document.querySelectorAll('nav button').forEach(n=>n.setAttribute('aria-selected',n===b?'true':'false'));
- document.querySelectorAll('main section').forEach(s=>s.hidden=s.id!==b.dataset.tab);drawAll()});
-$('#hist').addEventListener('click',async e=>{const b=e.target.closest('.del');if(!b)return;const d=b.dataset.d;
- if(b.textContent!=='Sure?'){b.textContent='Sure?';return}
- delete entries[d];delete photos[d];localSave();render();const c=store();if(c){try{await c.doc('e-'+d).delete();await c.doc('p-'+d).delete()}catch(err){}}});
-$('#checks').addEventListener('change',async e=>{const k=e.target.dataset.k;if(!k)return;checks[k]=e.target.checked;localSave();
- const c=store();if(c){try{await c.doc('checklist').set({...checks})}catch(err){}}});
-$('#copy').addEventListener('click',async()=>{const t=sorted().map(e=>`${e.date}: back ${e.back}/10, acne ${e.acne}/5 ${(e.areas||[]).join('/')}, cheek ${e.moist??'-'}%/${e.oil??'-'}%, T-zone ${e.tmoist??'-'}%/${e.toil??'-'}%, toilet ${e.poop||'-'}, bloating ${e.bloat||'-'}, fermented ${(e.ferm||[]).join('/')||'-'}, veg ${e.veg??'-'}, sweets ${e.sugar??'-'}, hair ${e.hair||'-'}, teeth ${(e.teeth||[]).join('/')||'-'}, energy ${e.energy}/5, sleep ${e.sleep??'-'}h, water ${e.water??'-'}${e.period?', period':''}${e.notes?', note: '+e.notes:''}`).join('\n');
- try{await navigator.clipboard.writeText(t||'No data yet');$('#copy').textContent='Copied'}catch(err){$('#copy').textContent='Copy not allowed here'}});
-
-/* ---------- plan ---------- */
-async function saveEntry(d,patch){entries[d]={date:d,...(entries[d]||{}),...patch};localSave();render();
- if($('#date').value===d){if(patch.water!=null)$('#water').value=patch.water;if('sleep' in patch)$('#sleep').value=patch.sleep??''}
- const c=store();if(c){try{await c.doc('e-'+d).set(entries[d])}catch(err){}}}
-function latest(){const l=sorted().reverse();return{skin:l.find(e=>e.moist!=null||e.oil!=null||e.toil!=null),last:l[0],w:l.slice(0,7)}}
-const SLOTS=[['Wake up – 9:00',0,9],['9:00 – 12:00',9,12],['12:00 – 15:00',12,15],['15:00 – 18:00',15,18],['18:00 – 21:00',18,21]];
-function plan(){$('#setup').hidden=!!profile.weight&&!editing;
- const kg=profile.weight||55,ml=Math.min(3500,Math.max(1500,Math.round(kg*33+(profile.feed?700:0)))),G=Math.round(ml/250);
- const per=SLOTS.map((_,i)=>Math.floor(G/5)+(i<G%5?1:0)),done=(entries[today()]||{}).water||0;
- const h=new Date().getHours(),cur=SLOTS.findIndex(s=>h>=s[1]&&h<s[2]);
- $('#wTotal').textContent=`${parseFloat((G*.25).toFixed(2))} L · ${done}/${G} glasses`;
- let byEnd=0;per.forEach((n,i)=>{if(i<=cur)byEnd+=n});const need=Math.max(0,byEnd-done);
- $('#wNow').textContent=done>=G?'You drank all your water today. Well done!':cur<0?(h>=21?`Day is ending: ${G-done} glass(es) were left. Small sips only, so you sleep well.`:'Start with 2 glasses when you wake up.'):need?`Now, until ${SLOTS[cur][2]}:00: drink ${need} more glass${need>1?'es':''} (${need*250} ml).`:`You're on track. Next glass after ${SLOTS[cur][2]}:00.`;
- if(!profile.weight)$('#wNow').textContent+=' (Add your weight in "About me" for your exact amount.)';
- let k=0;$('#slots').innerHTML=SLOTS.map((s,i)=>`<div class="slot${i===cur?' now':''}"><b>${s[0]}</b>${i===cur?' · now':''} · ${per[i]} glass${per[i]>1?'es':''}<div class="glasses">${Array.from({length:per[i]},()=>{const j=k++;return`<button type="button" class="gl" data-g="${j}" aria-pressed="${j<done}" aria-label="Glass ${j+1}">${j+1}</button>`}).join('')}</div></div>`).join('');
- const L=latest(),st=L.skin&&skinType(L.skin),type=st?st[0]:null,acneOn=(L.last&&L.last.acne>=2)||(profile.concerns||[]).includes('Acne');
- $('#rType').textContent=type?`For ${type.toLowerCase()} skin${acneOn?' with acne':''}.`:'Skin type not known yet. Use the skin meter in Check-in. Until then, this is a gentle basic routine.';
- const clean={Dry:'Rinse with lukewarm water or a mild cream cleanser',Oily:'Gentle foaming cleanser (no scrub)',Combination:'Gentle foaming cleanser, mostly on forehead and nose','Dehydrated oily':'Gentle, low-foam cleanser (no scrub)'}[type]||'Gentle cleanser';
- const moist={Dry:'Rich cream with ceramides',Oily:'Light, oil-free gel moisturiser',Combination:'Light gel on forehead and nose, cream on cheeks','Dehydrated oily':'Light hydrating gel (hyaluronic acid), oil-free'}[type]||'Light lotion moisturiser';
- const am=[clean,moist,'Sunscreen SPF 30 or more, even on cloudy days'];
- const pm=['Wash off sunscreen and makeup with a gentle cleanser'];
- if(acneOn)pm.push('Acne care: a product with salicylic acid (BHA) or azelaic acid, 2–3 nights a week to start'+(profile.feed?'. You are breastfeeding, so ask your doctor or pharmacist first and avoid retinol':''));
- pm.push(moist,'Don\'t touch or pop spots; change your pillowcase twice a week');
- $('#rAm').innerHTML=am.map(x=>`<li>${x}</li>`).join('');$('#rPm').innerHTML=pm.map(x=>`<li>${x}</li>`).join('');
- const c=profile.concerns||[],hb=[['Fermented food','1 today: natto, miso soup or plain yogurt'],['Vegetables and fruit','5 servings. Add seaweed or mushrooms for fiber'],['Move','15-minute walk after lunch']];
- const backAvg=avg(L.w,e=>e.back);
- if(c.includes('Back pain')||(backAvg!=null&&backAvg>=3))hb.push(['Back','Gentle walking helps. Lift your child or bags with bent knees and a straight back. Ask a physio for exercises made for you']);
- if(L.last&&(L.last.poop==='Hard'||L.last.poop==='None'))hb.push(['Toilet','Last check-in was hard or none: 2 extra glasses of water and a kiwi or prunes today']);
- if(avg(L.w,e=>e.sugar)>=3)hb.push(['Sweets','Swap one sweet for fruit today']);
- if(c.includes('Teeth'))hb.push(['Teeth','Calcium foods: tofu, small fish, yogurt, komatsuna. Brush gently, floss at night']);
- if(c.includes('Hair fall'))hb.push(['Hair','Protein at every meal: eggs, fish, tofu. Iron: red meat, spinach, hijiki']);
- if(c.includes('Tiredness'))hb.push(['Energy','Eat breakfast with protein. A blood test can check iron, B12 and vitamin D']);
- hb.push(['Sleep','Aim for 7 hours. Phone away 30 minutes before bed']);
- $('#habits').innerHTML=hb.map(([a,b])=>`<li><span><b>${a}</b><br>${b}</span></li>`).join('')}
-let editing=false;
-$('#pEdit').addEventListener('click',()=>{editing=true;$('#pWeight').value=profile.weight||'';setPicked('feed',profile.feed==null?[]:[profile.feed?'Yes':'No']);setPicked('concerns',profile.concerns);plan();$('#setup').scrollIntoView({behavior:'smooth'})});
-$('#pSave').addEventListener('click',async()=>{const w=num($('#pWeight').value);if(!w){$('#pWeight').focus();return}
- profile={weight:w,feed:picked('feed')[0]==='Yes',concerns:picked('concerns')};editing=false;localSave();render();
- const c=store();if(c){try{await c.doc('profile').set(profile)}catch(err){}}});
-$('#slots').addEventListener('click',e=>{const b=e.target.closest('.gl');if(!b)return;const j=+b.dataset.g,done=(entries[today()]||{}).water||0;
- saveEntry(today(),{water:done===j+1?j:j+1})});
-$('#adv').addEventListener('click',async()=>{const o=$('#advOut');if(!sample){o.innerHTML='<p class="hint">AI advice is not available here.</p>';return}
- const L=latest(),st=L.skin&&skinType(L.skin);o.innerHTML='<p class="hint">Reading your week…</p>';$('#adv').disabled=true;
- const days=L.w.map(e=>({date:e.date,acne:e.acne,areas:e.areas,back:e.back,toilet:e.poop,bloating:e.bloat,fermented:e.ferm,veg:e.veg,sweets:e.sugar,sleep:e.sleep,water_glasses:e.water,energy:e.energy,period:e.period,hair:e.hair,teeth:e.teeth,scan:e.scan?.summary,note:e.notes}));
- const prods=Object.values(products).map(p=>({name:p.name,verdict:p.verdict,reactions:(p.reactions||[]).map(r=>r.r)}));
- try{const r=await sample(`You are a kind wellness helper in a personal health diary app for a mother (4 years after pregnancy) living in Japan. Today is ${today()}. Profile: ${JSON.stringify({weight_kg:profile.weight,breastfeeding:profile.feed,wants_to_improve:profile.concerns,skin_type:st?st[0]:'unknown'})}. Last check-ins: ${JSON.stringify(days)}. Products she uses: ${JSON.stringify(prods)}.
-Write today's advice as 4 to 6 short lines, each starting with "• ", in very simple English (she is not a native speaker). Focus on concrete things to do TODAY (water, food, skin, body, sleep). Point out any pattern you see in her data, and say if a product seems to make her skin worse. Do not diagnose disease and do not suggest medicine doses. If anything looks worrying (strong or growing pain, bleeding, sudden big changes), add one line saying to see a doctor. No title, no extra text.`,{modelTier:'default'});
-  const t=(r.text||'').trim();try{localStorage.setItem('bc-adv',JSON.stringify({d:today(),t}))}catch(e){}
-  o.innerHTML=t.split('\n').filter(x=>x.trim()).map(x=>`<p>${esc(x)}</p>`).join('')}
- catch(err){o.innerHTML=`<p class="hint">${err&&err.code==='rate_limited'?'Too many requests right now. Try again later.':'Could not get advice right now.'}</p>`}
- $('#adv').disabled=false});
-try{const a=JSON.parse(localStorage.getItem('bc-adv')||'null');if(a&&a.d===today())$('#advOut').innerHTML=a.t.split('\n').filter(x=>x.trim()).map(x=>`<p>${esc(x)}</p>`).join('')}catch(e){}
-
-/* ---------- products ---------- */
-const VERD={good:['Good match','b-good'],care:['Use with care','b-care'],avoid:['May not suit you','b-avoid']};
-const REACT=['Better','Same','Worse','Itchy or red'];
-function renderProducts(){const l=Object.values(products).sort((a,b)=>a.added<b.added?1:-1);
- $('#prodList').innerHTML=l.length?l.map(p=>{const v=VERD[p.verdict],rs=p.reactions||[],td=rs.find(r=>r.date===today());
-  const cnt=REACT.map(r=>[r,rs.filter(x=>x.r===r).length]).filter(x=>x[1]);const bad=rs.some(r=>r.r==='Itchy or red')||rs.filter(r=>r.r==='Worse').length>=2;
-  return`<div class="prod">${p.img?`<img src="${p.img}" alt="">`:'<span></span>'}<div><b>${esc(p.name)}</b> ${v?`<span class="badge ${v[1]}">${v[0]}</span>`:''}
-  ${p.why?`<p>${esc(p.why)}</p>`:''}${p.good?.length?`<p class="hint">Good: ${esc(p.good.join(', '))}</p>`:''}${p.watch?.length?`<p class="hint">Watch out: ${esc(p.watch.join(', '))}</p>`:''}
-  ${p.how?`<p class="hint">How to use: ${esc(p.how)}</p>`:''}<p class="hint">Using since ${p.added.slice(5)}${cnt.length?' · '+cnt.map(([r,n])=>r.toLowerCase()+' '+n).join(', '):''}</p>
-  <div class="react">${REACT.map(r=>`<button type="button" data-p="${p.id}" data-r="${r}" aria-pressed="${td&&td.r===r}">${r}</button>`).join('')}<button type="button" class="del" data-pd="${p.id}">Remove</button></div>
-  ${bad?'<div class="warn">Your skin reacted badly. Stop using this for now. If redness or itching lasts more than 2 days, see a dermatologist (皮膚科).</div>':''}</div></div>`}).join(''):'<p class="hint">No products yet. Take a photo of one above.</p>'}
-async function saveProd(p){products[p.id]=p;localSave();renderProducts();const c=store();if(c){try{await c.doc(p.id).set(p)}catch(err){}}}
-$('#prodList').addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;
- if(b.dataset.pd){if(b.textContent!=='Sure?'){b.textContent='Sure?';return}const id=b.dataset.pd;delete products[id];localSave();renderProducts();const c=store();if(c){try{await c.doc(id).delete()}catch(err){}}return}
- const p={...products[b.dataset.p]};p.reactions=(p.reactions||[]).filter(r=>r.date!==today());if(b.getAttribute('aria-pressed')!=='true')p.reactions.push({date:today(),r:b.dataset.r});saveProd(p)});
-let prodImg=null;
-$('#prodPhoto').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{prodImg=(await shrink(f,240,.6)).url;$('#prodMsg').textContent='Photo added.'}catch(err){$('#prodMsg').textContent='Could not use this photo.'}});
-$('#prodAdd').addEventListener('click',async()=>{const n=$('#prodName').value.trim();if(!n){$('#prodName').focus();return}
- await saveProd({id:'prod-'+Date.now().toString(36),name:n.slice(0,80),verdict:null,why:'',good:[],watch:[],how:'',img:prodImg,added:today(),reactions:[]});
- $('#prodName').value='';prodImg=null;$('#prodMsg').textContent=`Added: ${n}. Try it on a small spot first (behind the ear) for 2 days.`});
-
-/* ---------- sleep and reminders ---------- */
-const hm=m=>{m=(m%1440+1440)%1440;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')};
+/* ---------- plan logic ---------- */
 const SL={'Under 5h':4.5,'5–6h':5.5,'6–7h':6.5,'7–8h':7.5,'8h+':8.5};
+const hm=m=>{m=(m%1440+1440)%1440;return Math.floor(m/60)+':'+String(m%60).padStart(2,'0')};
+const glasses=()=>Math.round(Math.min(3500,Math.max(1500,(profile.weight||55)*33+(profile.feed?700:0)))/250);
+const SLOTS=[[0,9],[9,12],[12,15],[15,18],[18,21]];
+function waterPlan(){const G=glasses(),per=SLOTS.map((_,i)=>Math.floor(G/5)+(i<G%5?1:0)),h=new Date().getHours(),cur=SLOTS.findIndex(s=>h>=s[0]&&h<s[1]);let by=0;per.forEach((n,i)=>{if(i<=cur)by+=n});return{G,cur,by,end:cur>=0?SLOTS[cur][1]:null}}
+function skinType(e){if(!e)return null;const m=e.moist,o=e.oil,to=e.toil;if(m==null&&o==null&&to==null)return null;
+ const cO=o!=null&&o>30,tO=to!=null&&to>30,cD=m!=null&&m<35;
+ if(tO&&!cO)return['Combination','Oily forehead and nose, normal or dry cheeks. Light gel on the T-zone, richer cream on the cheeks.'];
+ if(cO&&cD)return['Dehydrated oily','Makes oil but lacks water. Light oil-free moisturiser, gentle cleanser, no harsh scrubs.'];
+ if(cO)return['Oily','Gentle foaming cleanser and light gel moisturiser. Oily skin gets acne more easily.'];
+ if(cD)return['Dry','Creamy cleanser and a richer moisturiser. Avoid very hot water.'];
+ return['Normal','Balanced skin. Keep it simple: gentle wash, moisturiser, sunscreen.']}
+const lastSkin=()=>sorted().reverse().find(e=>e.moist!=null||e.oil!=null||e.toil!=null);
+function routine(){const st=skinType(lastSkin()),t=st?st[0]:null,L=sorted().reverse()[0],acne=(L&&L.acne>=2)||(profile.concerns||[]).includes('Acne');
+ const clean={Dry:'Lukewarm water or a mild cream cleanser',Oily:'Gentle foaming cleanser, no scrub',Combination:'Gentle foaming cleanser, mainly forehead and nose','Dehydrated oily':'Gentle low-foam cleanser'}[t]||'Gentle cleanser';
+ const moist={Dry:'Rich cream with ceramides',Oily:'Light oil-free gel moisturiser',Combination:'Gel on T-zone, cream on cheeks','Dehydrated oily':'Hydrating gel with hyaluronic acid'}[t]||'Light moisturiser';
+ const am=[clean,moist,'Sunscreen SPF 30+, even when cloudy'],pm=['Wash off sunscreen and makeup'];
+ if(acne)pm.push('Acne care: salicylic or azelaic acid, 2–3 nights a week'+(profile.feed?' (ask your doctor first while breastfeeding)':''));
+ pm.push(moist,'Clean pillowcase twice a week');return{am,pm,type:t,acne}}
+function computeScore(){const t=entries[today()]||{},w=waterPlan(),r=routine();
+ const water=Math.min(1,(t.water||0)/w.G),log=t.acne!=null||t.back!=null||t.poop?1:0;
+ const sk=((t.am||[]).length/r.am.length+(t.pm||[]).length/r.pm.length)/2,sleep=t.sleep!=null?Math.min(1,t.sleep/7.5):0;
+ return{parts:[['Water',water,'var(--water)',`${t.water||0}/${w.G}`,'c-water'],['Check-in',log,'var(--body)',log?'Done':'Not yet','log'],['Skincare',sk,'var(--skin)',`${(t.am||[]).length+(t.pm||[]).length}/${r.am.length+r.pm.length}`,'c-skin'],['Sleep',sleep,'var(--sleep)',t.sleep!=null?t.sleep+'h':'Not yet','c-sleep']],score:Math.round((water*.35+log*.25+sk*.2+sleep*.2)*100)}}
+
+/* ---------- render: Today ---------- */
+function arc(cx,cy,r,a0,a1){const p=a=>[cx+r*Math.cos((a-90)*Math.PI/180),cy+r*Math.sin((a-90)*Math.PI/180)],[x0,y0]=p(a0),[x1,y1]=p(a1);return`M${x0.toFixed(2)} ${y0.toFixed(2)} A${r} ${r} 0 ${a1-a0>180?1:0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`}
+function renderToday(){const now=new Date(),h=now.getHours();
+ const nm=(user&&user.displayName||profile.name||'').split(' ')[0];
+ $('#hiName').textContent=(h<12?'Good morning':h<18?'Good afternoon':'Good evening')+(nm?', '+nm:'');
+ $('#hiDate').textContent=now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+ const ini=(nm||(user&&user.email)||'?')[0].toUpperCase();$('#avatarBtn').textContent=ini;$('#meAv').textContent=ini;
+ const {parts,score}=computeScore();$('#score').textContent=score;
+ let g='';parts.forEach(([,v,c],i)=>{const a0=i*90+4,a1=i*90+86;g+=`<path d="${arc(75,75,62,a0,a1)}" fill="none" stroke="#F0DCE4" stroke-width="13" stroke-linecap="round"/>`;if(v>0.02)g+=`<path d="${arc(75,75,62,a0,a0+(a1-a0)*Math.min(1,v))}" fill="none" stroke="${c}" stroke-width="13" stroke-linecap="round"/>`});
+ $('#ring').innerHTML=g;
+ $('#legend').innerHTML=parts.map(([n,,c,val,to])=>`<button type="button" data-to="${to}"><span class="dot" style="background:${c}"></span>${n}<em>${val}</em></button>`).join('');
+ /* up next */
+ const t=entries[today()]||{},w=waterPlan(),done=t.water||0,need=Math.max(0,w.by-done),r=routine();let nx;
+ if(need>0&&w.cur>=0)nx=[`Drink ${need} glass${need>1?'es':''} of water`,`before ${w.end}:00`,'+ Glass','water'];
+ else if(!(t.acne!=null||t.back!=null||t.poop))nx=['Log how you feel today','takes 1 minute','Open log','log'];
+ else if(h>=19&&(t.pm||[]).length<r.pm.length)nx=['Night skincare',`${r.pm.length-(t.pm||[]).length} steps left`,'Show','pm'];
+ else if(h<12&&(t.am||[]).length<r.am.length)nx=['Morning skincare',`${r.am.length-(t.am||[]).length} steps left`,'Show','am'];
+ else if(done<w.G)nx=['You are on track',`${w.G-done} glasses left today`,'+ Glass','water'];
+ else nx=['All done for now','Great care today. Rest well.',null,null];
+ $('#next').innerHTML=`<p>${nx[0]}<small>${nx[1]}</small></p>${nx[2]?`<button type="button" data-act="${nx[3]}">${nx[2]}</button>`:''}`;
+ /* water */
+ $('#drops').innerHTML=Array.from({length:w.G},(_,i)=>`<button type="button" class="drop" data-i="${i}" aria-pressed="${i<done}" aria-label="Glass ${i+1}"><svg viewBox="0 0 34 40"><path d="M17 3c6 7.5 12 14 12 21a12 12 0 0 1-24 0c0-7 6-13.5 12-21z"/></svg></button>`).join('');
+ $('#wText').textContent=`${done} of ${w.G} · ${parseFloat((done*.25).toFixed(2))} / ${parseFloat((w.G*.25).toFixed(2))} L`;
+ $('#wNext').textContent=done>=w.G?'Goal reached':w.cur<0?(h<9?'Start with 2 glasses':'Small sips now'):need?`${need} more by ${w.end}:00`:`Next after ${w.end}:00`;
+ /* skincare */
+ const pm=$('#pmBtn').getAttribute('aria-pressed')==='true',list=pm?r.pm:r.am,doneS=pm?(t.pm||[]):(t.am||[]);
+ $('#sType').textContent=r.type?r.type.toLowerCase()+' skin':'';
+ $('#steps').innerHTML=list.map((s,i)=>`<label><input type="checkbox" data-i="${i}" ${doneS.includes(i)?'checked':''}><span>${esc(s)}</span></label>`).join('');
+ /* sleep */
+ const wk=(profile.wake||'6:30').split(':').map(Number),wm=wk[0]*60+wk[1];$('#slWind').textContent=hm(wm-510);$('#slBed').textContent=hm(wm-480);$('#slWake').textContent=hm(wm);
+ const inv=Object.entries(SL).find(([,v])=>v===t.sleep);setPicked('slept',inv?[inv[0]]:[]);
+ const sa=avg(sorted().slice(-7),e=>e.sleep);$('#slAvg').textContent=sa==null?'':`avg ${sa.toFixed(1)}h`;
+ /* tips */
+ const c=profile.concerns||[],L=sorted().slice(-7),tips=[['var(--gut)','Fermented food','One today: natto, miso soup or plain yogurt.'],['var(--gut)','Fibre','Five servings of vegetables and fruit. Seaweed and mushrooms count.'],['var(--body)','Move','A 15-minute walk after lunch helps digestion and your back.']];
+ if(c.includes('Back pain')||(avg(L,e=>e.back)||0)>=3)tips.unshift(['var(--body)','Back care','Lift with bent knees and a straight back. A physio can give exercises made for you.']);
+ const last=sorted().reverse()[0];if(last&&(last.poop==='Hard'||last.poop==='None'))tips.unshift(['var(--gut)','Toilet','Two extra glasses of water and a kiwi or prunes today.']);
+ if(c.includes('Teeth'))tips.push(['var(--body)','Teeth','Calcium foods: tofu, small fish, yogurt, komatsuna.']);
+ if(c.includes('Hair fall'))tips.push(['var(--body)','Hair','Protein at every meal: eggs, fish, tofu. Iron: spinach, hijiki.']);
+ if(c.includes('Tiredness'))tips.push(['var(--body)','Energy','A blood test for iron, B12 and vitamin D can show why you feel tired.']);
+ tips.push(['var(--sleep)','Sleep','Phone away 30 minutes before bed.']);
+ $('#tips').innerHTML=tips.map(([col,a,b])=>`<div class="tip"><b><span class="dot" style="background:${col}"></span>${a}</b><p>${b}</p></div>`).join('')}
+$('#legend').addEventListener('click',e=>{const b=e.target.closest('[data-to]');if(!b)return;const t=b.dataset.to;if(t==='log')go('log');else $('#'+t).scrollIntoView({behavior:'smooth',block:'center'})});
+$('#next').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
+ if(a==='water')addWater(1);else if(a==='log')go('log');else{$('#'+(a==='pm'?'pmBtn':'amBtn')).click();$('#c-skin').scrollIntoView({behavior:'smooth',block:'center'})}});
+function addWater(n){const v=Math.max(0,Math.min(glasses(),((entries[today()]||{}).water||0)+n));saveEntry(today(),{water:v});if(n>0)toast(v>=glasses()?'Water goal reached':'Glass added')}
+$('#wPlus').addEventListener('click',()=>addWater(1));$('#wMinus').addEventListener('click',()=>addWater(-1));
+$('#drops').addEventListener('click',e=>{const b=e.target.closest('.drop');if(!b)return;const i=+b.dataset.i,d=(entries[today()]||{}).water||0;saveEntry(today(),{water:d===i+1?i:i+1})});
+$('#amBtn').addEventListener('click',()=>{$('#amBtn').setAttribute('aria-pressed','true');$('#pmBtn').setAttribute('aria-pressed','false');renderToday()});
+$('#pmBtn').addEventListener('click',()=>{$('#pmBtn').setAttribute('aria-pressed','true');$('#amBtn').setAttribute('aria-pressed','false');renderToday()});
+if(new Date().getHours()>=15){$('#pmBtn').setAttribute('aria-pressed','true');$('#amBtn').setAttribute('aria-pressed','false')}
+$('#steps').addEventListener('change',e=>{const i=+e.target.dataset.i,k=$('#pmBtn').getAttribute('aria-pressed')==='true'?'pm':'am',cur=new Set((entries[today()]||{})[k]||[]);e.target.checked?cur.add(i):cur.delete(i);saveEntry(today(),{[k]:[...cur].sort()})});
+$('#slept').addEventListener('change',()=>{const p=picked('slept')[0];saveEntry(today(),{sleep:p?SL[p]:null});if(p)toast('Sleep saved')});
+
+/* ---------- Log ---------- */
+let logDate=today(),logPhoto=null;
+function dayLabel(d){return d===today()?'Today':d===shift(today(),-1)?'Yesterday':new Date(d+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}
+function fillLog(){const e=entries[logDate]||{};$('#dLabel').textContent=dayLabel(logDate);$('#dNext').disabled=logDate>=today();
+ setScale('acne',e.acne);setScale('back',e.back);setScale('energy',e.energy);setPicked('areas',e.areas);setPicked('hair',e.hair?[e.hair]:[]);setPicked('teeth',e.teeth);setPicked('period',e.period?['On my period']:[]);
+ setPicked('poop',e.poop?[e.poop]:[]);setPicked('bloat',e.bloat?[e.bloat]:[]);setPicked('ferm',e.ferm);
+ $$('.stepper[data-k]').forEach(s=>{const o=s.querySelector('output');o.textContent=e[s.dataset.k]??0});
+ ['moist','oil','tmoist','toil'].forEach(k=>$('#'+k).value=e[k]??'');$('#note').value=e.notes||'';
+ logPhoto=photos[logDate]||null;$('#phImg').hidden=!logPhoto;if(logPhoto)$('#phImg').src=logPhoto}
+$('#dPrev').addEventListener('click',()=>{logDate=shift(logDate,-1);fillLog()});
+$('#dNext').addEventListener('click',()=>{if(logDate<today()){logDate=shift(logDate,1);fillLog()}});
+function shrink(file,max,q){return new Promise((res,rej)=>{const img=new Image();img.onload=()=>{const k=Math.min(1,max/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(img.src);res(c.toDataURL('image/jpeg',q))};img.onerror=rej;img.src=URL.createObjectURL(file)})}
+$('#phIn').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{logPhoto=await shrink(f,360,.65);$('#phImg').src=logPhoto;$('#phImg').hidden=false}catch(x){toast('Could not use this photo')}});
+const num=v=>v===''?null:Number(v);
+$('#saveLog').addEventListener('click',async()=>{const p={acne:scaleVal('acne'),back:scaleVal('back'),energy:scaleVal('energy'),areas:picked('areas'),hair:picked('hair')[0]||null,teeth:picked('teeth'),period:picked('period').length>0,
+ poop:picked('poop')[0]||null,bloat:picked('bloat')[0]||null,ferm:picked('ferm'),notes:$('#note').value.trim()};
+ $$('.stepper[data-k]').forEach(s=>p[s.dataset.k]=+s.querySelector('output').textContent);['moist','oil','tmoist','toil'].forEach(k=>p[k]=num($('#'+k).value));
+ if(logPhoto&&logPhoto!==photos[logDate]){photos[logDate]=logPhoto;put('p-'+logDate,{date:logDate,img:logPhoto})}
+ await saveEntry(logDate,p);toast('Log saved');if(logDate===today())go('today')});
+
+/* ---------- Skin ---------- */
+const VERD=['Better','Same','Worse','Itchy or red'];let prodImg=null;
+function renderSkin(){const ls=lastSkin(),st=skinType(ls);$('#skType').textContent=st?st[0]:'Not measured yet';
+ $('#skTip').textContent=st?st[1]:'Add skin meter numbers in Log to find your skin type.';$('#skFrom').textContent=ls?'Your skin type · from '+dayLabel(ls.date):'Your skin type';
+ const ph=Object.keys(photos).sort().reverse();$('#photos').innerHTML=ph.length?ph.map(d=>`<figure><img src="${photos[d]}" alt="Face photo ${d}"><figcaption>${d.slice(5).replace('-','/')}</figcaption></figure>`).join(''):'<p class="sub" style="grid-column:1/-1">Add a face photo in Log to start your diary.</p>';
+ const l=Object.values(products).sort((a,b)=>a.added<b.added?1:-1);
+ $('#prodList').innerHTML=l.map(p=>{const rs=p.reactions||[],td=rs.find(r=>r.date===today()),bad=rs.some(r=>r.r==='Itchy or red')||rs.filter(r=>r.r==='Worse').length>=2,cnt=VERD.map(r=>[r,rs.filter(x=>x.r===r).length]).filter(x=>x[1]);
+  return`<div class="prod">${p.img?`<img src="${p.img}" alt="">`:'<span class="ph"></span>'}<div><div class="spread"><b>${esc(p.name)}</b><button class="link" type="button" data-pd="${p.id}" style="font-size:13px;color:var(--muted)">Remove</button></div>
+  <p class="sub">Added ${dayLabel(p.added).toLowerCase()}${cnt.length?' · '+cnt.map(([r,n])=>r.toLowerCase()+' '+n).join(', '):''}</p>
+  <div class="react" style="--c:var(--skin)">${VERD.map(r=>`<button type="button" class="chip" data-p="${p.id}" data-r="${r}" aria-pressed="${!!(td&&td.r===r)}">${r}</button>`).join('')}</div>
+  ${bad?'<p class="warn">Your skin reacted badly. Stop using it for now. If redness lasts over 2 days, see a dermatologist (皮膚科).</p>':''}</div></div>`}).join('')}
+async function saveProd(p){products[p.id]=p;localSave();renderSkin();await put(p.id,p)}
+$('#pPhoto').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{prodImg=await shrink(f,200,.6);toast('Photo added')}catch(x){toast('Could not use this photo')}});
+$('#pAdd').addEventListener('click',async()=>{const n=$('#pName').value.trim();if(!n){$('#pName').focus();toast('Type the product name');return}
+ await saveProd({id:'prod-'+Date.now().toString(36),name:n.slice(0,80),img:prodImg,added:today(),reactions:[]});$('#pName').value='';prodImg=null;toast('Product added. Patch test for 2 days first.')});
+$('#pForm').addEventListener('submit',e=>{e.preventDefault();$('#pAdd').click()});
+$('#prodList').addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.pd){if(b.textContent!=='Sure?'){b.textContent='Sure?';return}const id=b.dataset.pd;delete products[id];localSave();renderSkin();const c=store();if(c)c.doc(id).delete().catch(()=>{});return}
+ if(!b.dataset.p)return;const p={...products[b.dataset.p]};p.reactions=(p.reactions||[]).filter(r=>r.date!==today());if(b.getAttribute('aria-pressed')!=='true')p.reactions.push({date:today(),r:b.dataset.r});saveProd(p)});
+
+/* ---------- Insights ---------- */
+function renderInsights(){const a=sorted(),out=[];
+ if(a.length<3)out.push(['var(--muted)','Log for 3 days and patterns will show here.']);
+ else{const r=a.slice(-7),p=a.slice(-14,-7),b1=avg(r,e=>e.back),b0=avg(p,e=>e.back);
+  if(b1!=null)out.push(['var(--body)',`Back pain this week: <b>${b1.toFixed(1)}/10</b>`+(b0!=null?` (before ${b0.toFixed(1)})`:'')]);
+  const on=a.filter(e=>e.period),off=a.filter(e=>!e.period),x=avg(on,e=>e.acne),y=avg(off,e=>e.acne);if(x!=null&&y!=null){out.push(['var(--skin)',`Acne on period days <b>${x.toFixed(1)}</b>, other days <b>${y.toFixed(1)}</b>.`+(x-y>=1?' It may follow your cycle. Tell the dermatologist.':'')])}
+  const bad=a.filter(e=>e.poop==='Hard'||e.poop==='None'||e.bloat==='A lot'),good=a.filter(e=>e.poop==='Normal'&&e.bloat!=='A lot'),gx=avg(bad,e=>e.acne),gy=avg(good,e=>e.acne);if(gx!=null&&gy!=null)out.push(['var(--gut)',`Acne on hard gut days <b>${gx.toFixed(1)}</b>, good gut days <b>${gy.toFixed(1)}</b>.`+(gx-gy>=1?' Your skin may react to your gut.':'')]);
+  const s1=avg(a.filter(e=>e.sleep!=null&&e.sleep<6),e=>e.back),s2=avg(a.filter(e=>e.sleep>=6),e=>e.back);if(s1!=null&&s2!=null&&s1-s2>=1)out.push(['var(--sleep)',`Back pain is higher after short sleep: <b>${s1.toFixed(1)}</b> vs <b>${s2.toFixed(1)}</b>.`]);
+  if(a.filter(e=>e.energy!=null&&e.energy<=2).length>=Math.ceil(a.length/2))out.push(['var(--body)','Low energy on many days. A blood test for iron, B12, vitamin D and thyroid can help.'])}
+ $('#pats').innerHTML=out.map(([c,t])=>`<div class="pat"><span class="dot" style="background:${c}"></span><p>${t}</p></div>`).join('');
+ const w=a.slice(-7),vg=avg(w,e=>e.veg);
+ $('#gutTiles').innerHTML=`<div class="tile"><b>${w.filter(e=>e.poop==='Normal').length}/${w.length}</b><span>normal toilet</span></div><div class="tile"><b>${w.filter(e=>(e.ferm||[]).length).length}/${w.length}</b><span>fermented food</span></div><div class="tile"><b>${vg==null?'–':vg.toFixed(1)}</b><span>veg a day</span></div>`;
+ $('#hist').innerHTML=a.slice(-14).reverse().map(e=>`<div><b>${dayLabel(e.date)}</b><br><span class="sub">${[e.back!=null&&'back '+e.back,e.acne!=null&&'acne '+e.acne,e.water!=null&&e.water+' glasses',e.sleep!=null&&e.sleep+'h sleep',e.poop&&'toilet '+e.poop.toLowerCase()].filter(Boolean).join(', ')||'water only'}</span>${e.notes?`<br><span class="sub">${esc(e.notes)}</span>`:''}</div>`).join('')||'<p class="sub">No days logged yet.</p>'}
+$('#copyAll').addEventListener('click',async()=>{const t=sorted().map(e=>`${e.date}: back ${e.back??'-'}/10, acne ${e.acne??'-'}/5 ${(e.areas||[]).join('/')}, water ${e.water??0}, sleep ${e.sleep??'-'}h, toilet ${e.poop||'-'}, bloating ${e.bloat||'-'}, energy ${e.energy??'-'}/5, hair ${e.hair||'-'}, teeth ${(e.teeth||[]).join('/')||'-'}${e.period?', period':''}${e.notes?', note: '+e.notes:''}`).join('\n');
+ try{await navigator.clipboard.writeText(t||'No data yet');toast('Copied')}catch(x){toast('Copy is not allowed here')}});
+
+/* ---------- charts ---------- */
+function chart(svg,a,series,max,ticks){const W=svg.clientWidth,H=svg.clientHeight;if(!W)return;const L=28,R=10,T=10,B=24,iw=W-L-R,ih=H-T-B;
+ const pts=series.map(s=>({c:s.c,p:a.map((e,i)=>[i,s.f(e)]).filter(([,v])=>v!=null&&!Number.isNaN(v))}));
+ if(a.length<2||!pts.some(s=>s.p.length>=2)){svg.innerHTML=`<text x="${W/2}" y="${H/2}" text-anchor="middle" fill="#75626C" font-size="14">Your chart appears after 2 days</text>`;return}
+ const x=i=>L+i*iw/(a.length-1),y=v=>T+ih-Math.min(v,max)/max*ih;let g='';
+ ticks.forEach(v=>g+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="#EEDDE4"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="#75626C">${v}</text>`);
+ [0,a.length-1].forEach(i=>g+=`<text x="${x(i)}" y="${H-6}" text-anchor="${i?'end':'start'}" font-size="11" fill="#75626C">${a[i].date.slice(5).replace('-','/')}</text>`);
+ pts.forEach(s=>{if(!s.p.length)return;g+=`<polyline fill="none" stroke="${s.c}" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" points="${s.p.map(([i,v])=>x(i)+','+y(v)).join(' ')}"/>`+s.p.map(([i,v])=>a.length>14&&i<a.length-1?'':`<circle cx="${x(i)}" cy="${y(v)}" r="3.2" fill="${s.c}"/>`).join('')});svg.innerHTML=g}
+function drawCharts(){const a=sorted().slice(-30).filter(e=>e.back!=null||e.acne!=null);
+ if(view==='insights')chart($('#mainChart'),a,[{f:e=>e.back,c:'#6E5AB8'},{f:e=>e.acne==null?null:e.acne*2,c:'#D0668A'}],10,[0,5,10]);
+ if(view==='skin')chart($('#skChart'),sorted().slice(-30).filter(e=>e.moist!=null||e.oil!=null||e.toil!=null),[{f:e=>e.moist,c:'#2A86AE'},{f:e=>e.oil,c:'#D0668A'},{f:e=>e.toil,c:'#C98A1B'}],80,[0,40,80])}
+const ro=new ResizeObserver(()=>drawCharts());['#mainChart','#skChart'].forEach(s=>ro.observe($(s)));
+
+/* ---------- Me ---------- */
+const DOC=[['blood','Blood test: vitamin D, calcium, iron (ferritin), B12, thyroid'],['ortho','Back: orthopedic clinic (整形外科) or physiotherapist'],['dr','Ask about the stomach muscle gap after pregnancy (diastasis recti)'],['derm','Skin: dermatologist (皮膚科) for cheek and jaw acne'],['dent','Teeth: dentist (歯科) check-up'],['gutdr','Gut: if toilet problems last weeks, 消化器内科'],['show','Show your history (Insights → Copy) to each doctor']];
 let alarmList=[];
-function sleepPlan(){const w=(profile.wake||'6:30').split(':').map(Number),wm=w[0]*60+w[1],bed=wm-480,wind=bed-30;
- setPicked('wake',[profile.wake||'6:30']);$('#sWind').textContent=hm(wind);$('#sBed').textContent=hm(bed);$('#sWake').textContent=hm(wm);
- const t=entries[today()]||{};const inv=Object.entries(SL).find(([,v])=>v===t.sleep);setPicked('slept',inv?[inv[0]]:[]);setPicked('sq',t.sq?[t.sq]:[]);
- const w7=sorted().slice(-7),sa=avg(w7,e=>e.sleep);
- $('#sTip').textContent=sa==null?'Tap how you slept each morning. The app will show your average.':sa<6?`Your average is ${sa.toFixed(1)} hours. That's low: it can make back pain, skin and energy worse. Try going to bed 30 minutes earlier this week.`:sa<7?`Your average is ${sa.toFixed(1)} hours. Close! 15–30 minutes more would help.`:`Your average is ${sa.toFixed(1)} hours. Great, keep it up.`;
- const kg=profile.weight||55,G=Math.round(Math.min(3500,Math.max(1500,Math.round(kg*33+(profile.feed?700:0))))/250);
- alarmList=[[hm(wm),'Wake up: drink 2 glasses of water'],[hm(Math.max(wm+150,600)),'Water: 1–2 glasses'],['12:30','Lunch + water, then 15-minute walk'],['15:00','Water: 1–2 glasses + stretch'],['18:00','Water: last 1–2 glasses'],[hm(wind),'Wind down: phone away, lights low, night skincare'],[hm(bed),'Bedtime']];
- $('#alarms').innerHTML=alarmList.map(([a,b])=>`<li><b>${a}</b><span style="flex:1">${b}</span></li>`).join('')+`<li><span class="hint">Water goal: ${G} glasses (${parseFloat((G*.25).toFixed(2))} L) a day.</span></li>`}
-document.querySelector('[data-group=wake]').addEventListener('click',async e=>{const b=e.target.closest('.chip');if(!b)return;
- profile={...profile,wake:b.textContent};localSave();render();const c=store();if(c){try{await c.doc('profile').set(profile)}catch(err){}}});
-document.querySelector('[data-group=slept]').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;
- saveEntry(today(),{sleep:b.getAttribute('aria-pressed')==='true'?SL[b.textContent]:null})});
-document.querySelector('[data-group=sq]').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;
- saveEntry(today(),{sq:b.getAttribute('aria-pressed')==='true'?b.textContent:null})});
-$('#copyAl').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(alarmList.map(([a,b])=>a+'  '+b).join('\n'));$('#copyAl').textContent='Copied'}catch(err){$('#copyAl').textContent='Copy not allowed here'}});
+function renderMe(){$('#meName').textContent=(user&&user.displayName)||profile.name||(guest?'Guest':'You');$('#meEmail').textContent=user&&user.email?user.email:guest?'Saved on this phone only':'';
+ if(document.activeElement!==$('#pW'))$('#pW').value=profile.weight||'';setPicked('feed',profile.feed==null?[]:[profile.feed?'Yes':'No']);setPicked('concerns',profile.concerns);setPicked('wake',[profile.wake||'6:30']);
+ const wk=(profile.wake||'6:30').split(':').map(Number),wm=wk[0]*60+wk[1];
+ alarmList=[[hm(wm),'Wake up: 2 glasses of water'],[hm(Math.max(wm+150,600)),'Water: 1–2 glasses'],['12:30','Lunch, water, 15-minute walk'],['15:00','Water and a stretch'],['18:00','Last water of the day'],[hm(wm-510),'Wind down: phone away, night skincare'],[hm(wm-480),'Bedtime']];
+ $('#alarms').innerHTML=alarmList.map(([a,b])=>`<div><b>${a}</b><span>${b}</span></div>`).join('');
+ $('#doc').innerHTML=DOC.map(([k,t])=>`<label><input type="checkbox" data-k="${k}" ${checks[k]?'checked':''}><span>${t}</span></label>`).join('');
+ $('#toAdmin').hidden=!isAdmin();$('#logout').textContent=guest&&!user?'Log in or sign up':'Log out'}
+$('#pSave').addEventListener('click',async()=>{const w=num($('#pW').value);profile={...profile,weight:w||null,feed:picked('feed')[0]?picked('feed')[0]==='Yes':null,concerns:picked('concerns'),wake:picked('wake')[0]||'6:30'};localSave();renderAll();toast('Saved');await put('profile',profile)});
+$('#doc').addEventListener('change',e=>{const k=e.target.dataset.k;checks[k]=e.target.checked;localSave();put('checklist',{...checks})});
+$('#copyAl').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(alarmList.map(([a,b])=>a+'  '+b).join('\n'));toast('Copied')}catch(x){toast('Copy is not allowed here')}});
 
-/* ---------- accounts (Firebase) ---------- */
-let auth=null,unsub=null,guest=false;
-try{guest=localStorage.getItem('bc-guest')==='1'}catch(e){}
-const showLogin=on=>{$('#boot').hidden=true;$('#loginBox').hidden=!on;$('#app').hidden=on;document.querySelector('nav').hidden=on};
-const lerr=t=>$('#lErr').textContent=t;
-const nice=e=>({'auth/invalid-email':'That email does not look right.','auth/missing-password':'Please type your password.','auth/weak-password':'Password needs 6 or more characters.','auth/email-already-in-use':'This email already has an account. Tap Log in.','auth/invalid-credential':'Email or password is wrong.','auth/wrong-password':'Email or password is wrong.','auth/user-not-found':'No account with this email. Tap Create account.','auth/popup-blocked':'Popup was blocked. Allow popups, or use email.','auth/popup-closed-by-user':'Login window was closed. Try again.','auth/unauthorized-domain':'This website is not added in Firebase yet (Authorized domains).','auth/too-many-requests':'Too many tries. Wait a few minutes.','auth/account-exists-with-different-credential':'You used another login with this email before. Try Continue with Google or email.','auth/requires-recent-login':'For safety, log out and log in again, then delete.'}[e&&e.code]||'Something went wrong. Please try again.');
-function setAcct(){const u=auth&&auth.currentUser&&!auth.currentUser.isAnonymous?auth.currentUser:null;
- $('#acct').innerHTML=u?`<span>Hi ${esc((u.displayName||'').split(' ')[0]||'there')} · ${esc(u.email||'')}</span><button class="link" type="button" id="logout" style="font-size:14px;min-height:32px">Log out</button>`:guest?`<span>Saved on this phone only</span>${auth?'<button class="link" type="button" id="toLogin" style="font-size:14px;min-height:32px">Log in to save online</button>':''}`:''}
-function clearLocal(){try{['bc-entries','bc-checks','bc-photos','bc-profile','bc-products','bc-adv','bc-guest'].forEach(k=>localStorage.removeItem(k))}catch(e){}
- entries={};checks={};photos={};profile={};products={};render();fill(today())}
-function startSync(){if(unsub)unsub();first=false;
- unsub=db.collection('data/users/'+uid).onSnapshot(s=>{
-  const next={},ph={},pr={};let ck=null,np=null;
-  s.docs.forEach(d=>{const v=d.data();if(d.id==='checklist')ck=v;else if(d.id==='profile')np=v;else if(d.id.startsWith('prod-'))pr[d.id]={...v};else if(d.id.startsWith('e-'))next[d.id.slice(2)]={...v};else if(d.id.startsWith('p-')&&v.img)ph[d.id.slice(2)]=v.img});
-  if(s.empty&&!s.metadata.fromCache&&!first){first=true;const c=store();
-   Object.values(entries).forEach(r=>c.doc('e-'+r.date).set(r).catch(()=>{}));Object.entries(photos).forEach(([d,img])=>c.doc('p-'+d).set({date:d,img}).catch(()=>{}));
-   Object.values(products).forEach(p=>c.doc(p.id).set(p).catch(()=>{}));if(Object.keys(profile).length)c.doc('profile').set(profile).catch(()=>{});if(Object.keys(checks).length)c.doc('checklist').set({...checks}).catch(()=>{});
-   $('#sync').textContent='Saved to your account';return}
-  entries=next;photos=ph;products=pr;profile=np?{...np}:{};checks=ck?{...ck}:{};localSave();render();if(!first){first=true;fill($('#date').value)}
-  $('#sync').textContent='Saved to your account. Only you can see it.'},
-  err=>{$('#sync').textContent='Could not reach your account. Saved on this phone for now.'})}
+function renderAll(){renderToday();renderSkin();renderInsights();renderMe();drawCharts()}
 
-const cfgOk=window.firebase&&!/PASTE/.test(FIREBASE_CONFIG.apiKey);
-if(cfgOk){try{firebase.initializeApp(FIREBASE_CONFIG);auth=firebase.auth();db=firebase.firestore()}catch(e){auth=null;db=null}}
-if(/Instagram|FBAN|FBAV/i.test(navigator.userAgent))$('#igNote').hidden=false;
-let triedAnon=false;
-setTimeout(()=>{if(!$('#boot').hidden)showLogin(!guest)},8000);
-async function track(u){try{const t=today();let last=null;try{last=localStorage.getItem('bc-seen-'+u.uid)}catch(e){}if(last===t)return;
- const r=db.collection('stats').doc(u.uid),g=await r.get(),v={lastActive:t,days:firebase.firestore.FieldValue.arrayUnion(t),anon:!!u.isAnonymous};
- if(!g.exists)v.created=t;await r.set(v,{merge:true});try{localStorage.setItem('bc-seen-'+u.uid,t)}catch(e){}}catch(e){}}
-const isAdmin=()=>!!(auth&&auth.currentUser&&!auth.currentUser.isAnonymous&&auth.currentUser.uid===ADMIN_UID);
-function enableAdmin(){if(!isAdmin()||document.querySelector('[data-tab=admin]'))return;
- const b=document.createElement('button');b.setAttribute('role','tab');b.dataset.tab='admin';b.setAttribute('aria-selected','false');b.textContent='Dashboard';document.querySelector('nav').appendChild(b)}
-if(auth){if(guest)showLogin(false);
- auth.onAuthStateChanged(u=>{
-  if(u&&u.isAnonymous){track(u);guest=true;uid=null;if(unsub){unsub();unsub=null}showLogin(false);setAcct();$('#sync').textContent='Saved on this phone only.';return}
-  if(u){track(u);if(guest){guest=false;try{localStorage.removeItem('bc-guest')}catch(e){}}uid=u.uid;showLogin(false);setAcct();startSync();enableAdmin();if(location.hash!=='#privacy')goHome();return}
-  uid=null;if(unsub){unsub();unsub=null}const ab=document.querySelector('[data-tab=admin]');if(ab)ab.remove();setAcct();showLogin(!guest&&location.hash!=='#privacy');
-  if(guest&&!triedAnon){triedAnon=true;auth.signInAnonymously().catch(()=>{})}$('#sync').textContent=guest?'Saved on this phone only.':''})}
-else{showLogin(false);$('#acct').innerHTML='';}
-$('#gLogin').addEventListener('click',()=>{lerr('');if(!auth)return lerr('Login is not set up yet.');auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e=>lerr(nice(e)))});
-if(FACEBOOK_ON)$('#fLogin').hidden=false;
-$('#fLogin').addEventListener('click',()=>{lerr('');if(!auth)return;const pr=new firebase.auth.FacebookAuthProvider();pr.addScope('email');auth.signInWithPopup(pr).catch(e=>lerr(nice(e)))});
-$('#lReset').addEventListener('click',()=>{const m=$('#lEmail').value.trim();if(!m){lerr('Type your email first, then tap Forgot password.');return}
- auth&&auth.sendPasswordResetEmail(m).then(()=>lerr('Check your email for a reset link.')).catch(e=>lerr(nice(e)))});
-$('#lGuest').addEventListener('click',()=>{guest=true;try{localStorage.setItem('bc-guest','1')}catch(e){}showLogin(false);setAcct();$('#sync').textContent='Saved on this phone only.';if(auth&&!auth.currentUser){triedAnon=true;auth.signInAnonymously().catch(()=>{})}});
-$('#acct').addEventListener('click',e=>{if(e.target.id==='logout'){auth.signOut().then(()=>{clearLocal();setMode('login');$('#lPass').value='';goHome()})}if(e.target.id==='toLogin'){guest=false;try{localStorage.removeItem('bc-guest')}catch(e){}if(auth.currentUser&&auth.currentUser.isAnonymous)auth.signOut();setAcct();showLogin(true)}});
-document.addEventListener('click',e=>{const b=e.target.closest('[data-go=privacy]');if(!b)return;
- if(!$('#loginBox').hidden){showLogin(false)}document.querySelectorAll('main section').forEach(x=>x.hidden=x.id!=='privacy');
- document.querySelectorAll('nav button').forEach(n=>n.setAttribute('aria-selected','false'));$('#privacy').scrollIntoView()});
-$('#delAcc').addEventListener('click',async()=>{const b=$('#delAcc'),m=$('#delMsg');
- if(b.textContent!=='Yes, delete everything'){b.textContent='Yes, delete everything';m.textContent='This cannot be undone. Tap again to confirm.';return}
- const cu=auth&&auth.currentUser,sr=cu&&!cu.isAnonymous?db.collection('stats').doc(cu.uid):null;
- try{const c=store();if(c){const all=await c.get();for(const d of all.docs)await d.ref.delete()}
-  if(sr)await sr.set({deleted:today()},{merge:true}).catch(()=>{});
-  if(cu&&!cu.isAnonymous)await cu.delete().catch(async e=>{if(sr)await sr.set({deleted:null},{merge:true}).catch(()=>{});throw e});clearLocal();m.textContent='Your data has been deleted.';b.textContent='Delete my account and data'}
- catch(e){m.textContent=nice(e)}});
-/* login / sign-up screens */
+/* ---------- accounts ---------- */
 let mode='login';
-function setMode(m){mode=m;const up=m==='signup';lerr('');
- $('#lTitle').textContent=up?'Create your account':'Welcome back';
- $('#lSub').textContent=up?'Free. Your plan and check-ins are saved and private to you.':'Log in to see your plan and check-ins on any phone.';
- $('#nameRow').hidden=!up;$('#pass2Row').hidden=!up;$('#passHint').hidden=!up;$('#resetRow').hidden=up;
- $('#lSubmit').textContent=up?'Create account':'Log in';$('#lPass').autocomplete=up?'new-password':'current-password';
- $('#swText').textContent=up?'Already have an account?':'New here?';$('#lSwitch').textContent=up?'Log in':'Create an account';
- $('#gLogin').lastChild.textContent=up?'Sign up with Google':'Continue with Google'}
-$('#lSwitch').addEventListener('click',()=>setMode(mode==='login'?'signup':'login'));
-$('#lForm').addEventListener('submit',async e=>{e.preventDefault();lerr('');if(!auth)return lerr('Login is not set up yet.');
- const em=$('#lEmail').value.trim(),pw=$('#lPass').value;
- if(mode==='signup'&&!$('#lName').value.trim())return lerr('Please type your name.');
- if(!em)return lerr('Please type your email.');
- if(!/^\S+@\S+\.\S+$/.test(em))return lerr('That email does not look right.');
- if(!pw)return lerr('Please type your password.');
- if(mode==='signup'){if(pw.length<6)return lerr('Password needs 6 or more characters.');if(pw!==$('#lPass2').value)return lerr('The two passwords are not the same.')}
- const b=$('#lSubmit'),t=b.textContent;b.disabled=true;b.textContent=mode==='signup'?'Creating…':'Logging in…';
- try{if(mode==='signup'){const r=await auth.createUserWithEmailAndPassword(em,pw);try{await r.user.updateProfile({displayName:$('#lName').value.trim()});r.user.sendEmailVerification().catch(()=>{})}catch(x){}setAcct()}
-  else await auth.signInWithEmailAndPassword(em,pw)}
- catch(err){lerr(nice(err))}
+const aerr=t=>$('#aErr').textContent=t;
+const nice=e=>({'auth/invalid-email':'That email does not look right.','auth/weak-password':'Password needs 6 or more characters.','auth/email-already-in-use':'This email already has an account. Switch to Log in.','auth/invalid-credential':'Email or password is wrong.','auth/wrong-password':'Email or password is wrong.','auth/user-not-found':'No account with this email. Switch to Sign up.','auth/popup-blocked':'The Google window was blocked. Allow pop-ups, or use email.','auth/popup-closed-by-user':'The Google window was closed. Try again.','auth/cancelled-popup-request':'','auth/unauthorized-domain':'This website is not allowed in Firebase yet.','auth/too-many-requests':'Too many tries. Wait a few minutes.','auth/network-request-failed':'No internet connection.','auth/requires-recent-login':'For safety, log out, log in again, then delete.'}[e&&e.code]??'Something went wrong. Try again.');
+function setMode(m){mode=m;const up=m==='signup';aerr('');$('#mLogin').setAttribute('aria-pressed',!up);$('#mSignup').setAttribute('aria-pressed',up);
+ $('#nameRow').hidden=!up;$('#pass2Row').hidden=!up;$('#resetRow').hidden=up;$('#aSubmit').textContent=up?'Create account':'Log in';$('#aPass').autocomplete=up?'new-password':'current-password';
+ $('#gText').textContent=up?'Sign up with Google':'Continue with Google';$('#aTitle').textContent=up?'Start your daily body check':'Your body, one gentle check a day';
+ $('#aSub').textContent=up?'Free and private. Takes one minute a day.':'Water, skin, gut and sleep in one place, with a plan for today.'}
+$('#mLogin').addEventListener('click',()=>setMode('login'));$('#mSignup').addEventListener('click',()=>setMode('signup'));
+$('#aForm').addEventListener('submit',async e=>{e.preventDefault();aerr('');if(!auth)return aerr('Login is not available right now. Use "Try without an account".');
+ const em=$('#aEmail').value.trim(),pw=$('#aPass').value;
+ if(mode==='signup'&&!$('#aName').value.trim()){$('#aName').focus();return aerr('Please type your name.')}
+ if(!em){$('#aEmail').focus();return aerr('Please type your email.')}
+ if(!/^\S+@\S+\.\S+$/.test(em)){$('#aEmail').focus();return aerr('That email does not look right.')}
+ if(!pw){$('#aPass').focus();return aerr('Please type your password.')}
+ if(mode==='signup'){if(pw.length<6)return aerr('Password needs 6 or more characters.');if(pw!==$('#aPass2').value)return aerr('The two passwords are not the same.')}
+ const b=$('#aSubmit'),t=b.textContent;b.disabled=true;b.textContent=mode==='signup'?'Creating account…':'Logging in…';
+ try{if(mode==='signup'){const r=await auth.createUserWithEmailAndPassword(em,pw);try{await r.user.updateProfile({displayName:$('#aName').value.trim()});r.user.sendEmailVerification().catch(()=>{})}catch(x){}renderAll()}
+  else await auth.signInWithEmailAndPassword(em,pw)}catch(err){aerr(nice(err))}
  b.disabled=false;b.textContent=t});
-function goHome(){document.querySelectorAll('nav button').forEach(n=>n.setAttribute('aria-selected',n.dataset.tab==='today'?'true':'false'));
- document.querySelectorAll('main section').forEach(x=>x.hidden=x.id!=='today');window.scrollTo(0,0)}
+$('#gLogin').addEventListener('click',()=>{aerr('');if(!auth)return aerr('Login is not available right now.');auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e=>aerr(nice(e)))});
+$('#aReset').addEventListener('click',()=>{const m=$('#aEmail').value.trim();if(!m){$('#aEmail').focus();return aerr('Type your email first, then tap Forgot password.')}
+ auth&&auth.sendPasswordResetEmail(m).then(()=>{aerr('');toast('Reset link sent to your email')}).catch(e=>aerr(nice(e)))});
+$('#aGuest').addEventListener('click',()=>{guest=true;try{localStorage.setItem('bc-guest','1')}catch(e){}enterApp();if(auth&&!auth.currentUser){triedAnon=true;auth.signInAnonymously().catch(()=>{})}});
+function clearLocal(){try{['bc-entries','bc-checks','bc-photos','bc-profile','bc-products','bc-guest'].forEach(k=>localStorage.removeItem(k))}catch(e){}entries={};checks={};photos={};profile={};products={}}
+$('#logout').addEventListener('click',async()=>{if(guest&&!user){guest=false;try{localStorage.removeItem('bc-guest')}catch(e){}if(auth&&auth.currentUser)await auth.signOut().catch(()=>{});setMode('login');screen('auth');return}
+ if(auth)await auth.signOut().catch(()=>{});clearLocal();setMode('login');$('#aPass').value='';screen('auth')});
+$('#delAcc').addEventListener('click',async()=>{const b=$('#delAcc'),m=$('#delMsg');if(b.textContent!=='Tap again to delete everything'){b.textContent='Tap again to delete everything';m.textContent='This cannot be undone.';return}
+ const cu=auth&&auth.currentUser,sr=cu&&!cu.isAnonymous&&db?db.collection('stats').doc(cu.uid):null;
+ try{const c=store();if(c){const all=await c.get();for(const d of all.docs)await d.ref.delete()}if(sr)await sr.set({deleted:today()},{merge:true}).catch(()=>{});
+  if(cu&&!cu.isAnonymous)await cu.delete().catch(async e=>{if(sr)await sr.set({deleted:null},{merge:true}).catch(()=>{});throw e});
+  clearLocal();guest=false;user=null;toast('Your data has been deleted');setMode('login');screen('auth')}catch(e){m.textContent=nice(e)}
+ b.textContent='Delete my account and data'});
 
-/* ---------- owner dashboard ---------- */
-const dayStr=n=>{const d=new Date();d.setDate(d.getDate()-n);return new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
-async function loadAdmin(){if(!isAdmin())return;$('#aWhen').textContent='Loading…';
- try{const snap=await db.collection('stats').get(),all=snap.docs.map(d=>d.data()),t=today(),d7=dayStr(6);
-  const acc=all.filter(x=>!x.anon),live=acc.filter(x=>!x.deleted),guests=all.filter(x=>x.anon),on=all.filter(x=>!x.deleted);
-  const tiles=[[live.length,'accounts now'],[guests.length,'guests (no account)'],[on.filter(x=>x.lastActive===t).length,'active today'],
-   [on.filter(x=>(x.days||[]).some(y=>y>=d7)).length,'active in 7 days'],[acc.filter(x=>x.created>=d7).length,'new accounts, 7 days'],
-   [acc.filter(x=>x.deleted).length+` <small style="font-size:14px">(${acc.filter(x=>x.deleted&&x.deleted>=d7).length} this week)</small>`,'deleted accounts']];
-  $('#aStats').innerHTML=tiles.map(([n,l])=>`<div class="stat"><b>${n}</b><span>${l}</span></div>`).join('');
-  const ser=[];for(let i=29;i>=0;i--){const d=dayStr(i);ser.push({date:d,a:all.filter(x=>(x.days||[]).includes(d)).length,n:acc.filter(x=>x.created===d).length})}
-  const mx=Math.max(5,Math.ceil(Math.max(...ser.map(x=>Math.max(x.a,x.n)))/5)*5);
-  chart($('#aChart'),ser,[{f:x=>x.a,c:'var(--teal)'},{f:x=>x.n,c:'var(--rose)'}],mx,[0,mx/2,mx]);
-  $('#aWhen').textContent='Updated '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})+' · '+acc.length+' accounts ever made'}
- catch(e){$('#aWhen').textContent='Could not load. Check the Firestore rules include the Dashboard part.'}}
-document.querySelector('nav').addEventListener('click',e=>{if(e.target.closest('[data-tab=admin]'))loadAdmin()});
-$('#aRefresh').addEventListener('click',loadAdmin);
+/* ---------- sync & stats ---------- */
+function startSync(){if(unsub)unsub();first=false;
+ unsub=store().onSnapshot(s=>{const next={},ph={},pr={};let ck=null,np=null;
+  s.docs.forEach(d=>{const v=d.data();if(d.id==='checklist')ck=v;else if(d.id==='profile')np=v;else if(d.id.startsWith('prod-'))pr[d.id]={...v};else if(d.id.startsWith('e-'))next[d.id.slice(2)]={...v};else if(d.id.startsWith('p-')&&v.img)ph[d.id.slice(2)]=v.img});
+  if(s.empty&&!s.metadata.fromCache&&!first){first=true;const c=store();Object.values(entries).forEach(r=>c.doc('e-'+r.date).set(r).catch(()=>{}));Object.entries(photos).forEach(([d,img])=>c.doc('p-'+d).set({date:d,img}).catch(()=>{}));
+   Object.values(products).forEach(p=>c.doc(p.id).set(p).catch(()=>{}));if(Object.keys(profile).length)c.doc('profile').set(profile).catch(()=>{});if(Object.keys(checks).length)c.doc('checklist').set({...checks}).catch(()=>{});return}
+  first=true;entries=next;photos=ph;products=pr;profile=np?{...np}:profile;checks=ck?{...ck}:{};localSave();renderAll();if(view==='log')fillLog()},
+  ()=>toast('Could not reach your account. Saving on this phone.'))}
+async function track(u){try{const t=today();let last=null;try{last=localStorage.getItem('bc-seen-'+u.uid)}catch(e){}if(last===t)return;
+ const r=db.collection('stats').doc(u.uid),g=await r.get(),v={lastActive:t,days:firebase.firestore.FieldValue.arrayUnion(t),anon:!!u.isAnonymous};if(!g.exists)v.created=t;await r.set(v,{merge:true});try{localStorage.setItem('bc-seen-'+u.uid,t)}catch(e){}}catch(e){}}
+const isAdmin=()=>!!(user&&user.uid===ADMIN_UID);
+const dayN=n=>shift(today(),-n);
+async function loadAdmin(){if(!isAdmin()){go('me');return}$('#aWhen').textContent='Loading…';
+ try{const snap=await db.collection('stats').get(),all=snap.docs.map(d=>d.data()),t=today(),d7=dayN(6),acc=all.filter(x=>!x.anon),live=acc.filter(x=>!x.deleted),guests=all.filter(x=>x.anon),on=all.filter(x=>!x.deleted);
+  const T=[[live.length,'accounts'],[guests.length,'guests'],[on.filter(x=>x.lastActive===t).length,'active today'],[on.filter(x=>(x.days||[]).some(y=>y>=d7)).length,'active 7 days'],[acc.filter(x=>x.created>=d7).length,'new 7 days'],[acc.filter(x=>x.deleted).length,'deleted']];
+  $('#aStats').innerHTML=T.map(([n,l])=>`<div class="tile"><b>${n}</b><span>${l}</span></div>`).join('');
+  const ser=[];for(let i=29;i>=0;i--){const d=dayN(i);ser.push({date:d,a:all.filter(x=>(x.days||[]).includes(d)).length,n:acc.filter(x=>x.created===d).length})}
+  const mx=Math.max(5,Math.ceil(Math.max(...ser.map(x=>Math.max(x.a,x.n)))/5)*5);chart($('#aChart'),ser,[{f:x=>x.a,c:'#2A86AE'},{f:x=>x.n,c:'#A23D63'}],mx,[0,mx/2,mx]);
+  $('#aWhen').textContent='updated '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}catch(e){$('#aWhen').textContent='Could not load. Check the database rules.'}}
+$('#toAdmin').addEventListener('click',()=>go('admin'));
 
-setAcct();
-if(location.hash==='#privacy'){showLogin(false);document.querySelectorAll('main section').forEach(x=>x.hidden=x.id!=='privacy');document.querySelectorAll('nav button').forEach(n=>n.setAttribute('aria-selected','false'))}
-
-fill(today());render();
-
-
+/* ---------- start ---------- */
+function enterApp(){screen('app');renderAll();if(location.hash==='#privacy'){backTo=(user||guest)?'today':'auth';if(!(user||guest))chrome(false);go('privacy')}else go('today')}
+if(/Instagram|FBAN|FBAV/i.test(navigator.userAgent))$('#igNote').hidden=false;
+const cfgOk=window.firebase&&FIREBASE_CONFIG.apiKey;
+if(cfgOk){try{firebase.initializeApp(FIREBASE_CONFIG);auth=firebase.auth();db=firebase.firestore()}catch(e){auth=null;db=null}}
+if(!auth){guest=true;enterApp()}
+else{
+ if(guest)enterApp();
+ setTimeout(()=>{if(!$('#boot').hidden){location.hash==='#privacy'?enterApp():screen('auth')}},8000);
+ auth.onAuthStateChanged(u=>{
+  if(u&&u.isAnonymous){track(u);user=null;uid=null;if(unsub){unsub();unsub=null}if(!guest){auth.signOut().catch(()=>{});screen('auth');return}if($('#app').hidden)enterApp();return}
+  if(u){track(u);user=u;uid=u.uid;if(guest){guest=false;try{localStorage.removeItem('bc-guest')}catch(e){}}startSync();enterApp();return}
+  user=null;uid=null;if(unsub){unsub();unsub=null}
+  if(guest){if($('#app').hidden)enterApp();if(!triedAnon){triedAnon=true;auth.signInAnonymously().catch(()=>{})}return}
+  if(location.hash==='#privacy'){enterApp();return}
+  screen('auth')})}
 }
 </script>
 </body>
