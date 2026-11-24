@@ -217,6 +217,58 @@ details[open] summary::after{content:"–"}
 .alarms b{font-variant-numeric:tabular-nums}
 .danger{color:#B3263E!important}
 
+/* sidebar (desktop only) */
+.side{display:none}
+.sidenav{display:grid;gap:4px}
+.sidenav button{display:flex;align-items:center;gap:12px;border:0;background:none;border-radius:12px;min-height:46px;padding:0 12px;font-weight:600;color:var(--muted);text-align:left;font-size:15px}
+.sidenav button svg{width:22px;height:22px}
+.sidenav button:hover{background:var(--wash)}
+.sidenav button[aria-current]{background:var(--wash);color:var(--berry)}
+.sideme{margin-top:auto;display:flex;align-items:center;gap:10px;border:0;background:none;padding:10px;border-radius:14px;text-align:left}
+.sideme:hover{background:var(--wash)}
+.sideme b{display:block;font-size:14px}.sideme small{display:block;font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px}
+.avatar svg{width:22px;height:22px}
+
+@media(min-width:900px){
+ html,body{background:var(--wash2)}
+ .shell{max-width:none;box-shadow:none;background:var(--wash2)}
+ #app:not([hidden]){display:grid;grid-template-columns:250px minmax(0,1fr);grid-template-rows:auto 1fr;min-height:100vh}
+ .side{grid-row:1/span 2;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;padding:24px 16px;background:#fff;border-right:1px solid var(--line)}
+ .tabbar{display:none}
+ .top{position:static;background:none;backdrop-filter:none;padding:30px 40px 6px;max-width:1240px;width:100%;margin:0 auto;border:0}
+ .top .hello b{font-size:28px}
+ .top .avatar{display:none}
+ #app>.top,#app>main{grid-column:2}
+ main{padding:16px 40px 40px;max-width:1240px;width:100%;margin:0 auto}
+ .view{grid-template-columns:repeat(12,minmax(0,1fr));gap:18px;align-items:start}
+ .view>*{grid-column:1/-1}
+ .view>.w4{grid-column:span 4}.view>.w5{grid-column:span 5}.view>.w6{grid-column:span 6}.view>.w7{grid-column:span 7}.view>.w8{grid-column:span 8}.view>.w12{grid-column:1/-1}
+ .card,.sec{border-color:transparent;box-shadow:0 1px 2px rgba(42,31,38,.04),0 8px 24px -16px rgba(162,61,99,.25)}
+ .hero{background:#fff;grid-template-columns:180px 1fr;padding:24px;gap:28px;box-shadow:0 1px 2px rgba(42,31,38,.04),0 8px 24px -16px rgba(162,61,99,.25)}
+ .ring,.ring svg{width:180px;height:180px}
+ .ring .score b{font-size:48px}
+ .legend{gap:12px}.legend button{font-size:15px}
+ .next{align-self:stretch;flex-direction:column;align-items:flex-start;justify-content:space-between;padding:24px;border-radius:var(--r-lg);background:var(--berry) radial-gradient(circle at 110% -10%,rgba(255,255,255,.22) 0 120px,transparent 121px)}
+ .next p{font-size:22px;font-family:"Young Serif",serif;font-weight:400}
+ .next small{font-family:Figtree,sans-serif;font-size:15px;margin-top:6px}
+ .next button{min-height:46px;padding:0 20px;font-size:15px}
+ .tips{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));overflow:visible;margin:0;padding:0}
+ .tip{background:#fff;box-shadow:0 1px 2px rgba(42,31,38,.04),0 8px 24px -16px rgba(162,61,99,.25)}
+ .savebar{position:static;display:flex;justify-content:flex-end}
+ .savebar .btn{width:260px}
+ .datebar{background:#fff;max-width:420px}
+ .skinhero{align-self:start;min-height:220px;display:flex;flex-direction:column;justify-content:center;padding:28px}
+ .skinhero b{font-size:38px}
+ .fig{height:240px}
+ #v-admin,#v-privacy{max-width:860px}
+ .photos{grid-template-columns:repeat(5,1fr)}
+ .toast{bottom:28px;left:calc(50% + 125px)}
+}
+@media(min-width:900px) and (max-width:1180px){
+ .view>.w4{grid-column:span 6}#c-sleep{grid-column:1/-1!important}
+ .tips{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
 /* toast */
 .toast{position:fixed;left:50%;bottom:calc(var(--tab) + var(--safe) + 18px);transform:translate(-50%,20px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:999px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:20;white-space:nowrap}
 .toast.on{opacity:1;transform:translate(-50%,0)}
@@ -269,6 +321,11 @@ details[open] summary::after{content:"–"}
 
 <!-- the app -->
 <div id="app" hidden>
+ <aside class="side" aria-label="Menu">
+  <div class="brand" style="padding:6px 10px 22px"><i><svg width="18" height="18" viewBox="0 0 64 64"><circle cx="32" cy="32" r="18" fill="none" stroke="#fff" stroke-width="7" stroke-dasharray="23 5" stroke-linecap="round"/></svg></i>My Body Check</div>
+  <nav class="sidenav" id="sidenav"></nav>
+  <button class="sideme" type="button" id="sideMe"><span class="avatar" id="sideAv"></span><span><b id="sideName">You</b><small id="sideEmail"></small></span></button>
+ </aside>
  <header class="top" id="top">
   <div class="hello"><b id="hiName">Hello</b><span id="hiDate"></span></div>
   <button class="avatar" type="button" id="avatarBtn" aria-label="Me"></button>
@@ -277,32 +334,32 @@ details[open] summary::after{content:"–"}
  <main>
  <!-- TODAY -->
  <section class="view" id="v-today" data-view="today">
-  <div class="hero">
+  <div class="hero w7">
    <div class="ring"><svg id="ring" viewBox="0 0 150 150" aria-hidden="true"></svg><div class="score"><b id="score">0</b><span>today's care</span></div></div>
    <div class="legend" id="legend"></div>
   </div>
-  <div class="next" id="next"></div>
+  <div class="next w5" id="next"></div>
 
-  <div class="card" id="c-water">
+  <div class="card w4" id="c-water">
    <div class="head"><span class="ico" style="background:#E4F1F7;color:var(--water)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5c3.3 4.2 6.5 8 6.5 11.5a6.5 6.5 0 0 1-13 0c0-3.5 3.2-7.3 6.5-11.5z"/></svg></span><h3>Water</h3><span class="sub" id="wText"></span></div>
    <div class="drops" id="drops"></div>
    <div class="spread"><span class="sub" id="wNext"></span><div class="stepper"><button type="button" id="wMinus" aria-label="Remove a glass">−</button><button class="btn small" type="button" id="wPlus" style="width:auto;height:44px">+ Glass</button></div></div>
   </div>
 
-  <div class="card" id="c-skin">
+  <div class="card w4" id="c-skin">
    <div class="head"><span class="ico" style="background:#FBE3EC;color:var(--skin)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><circle cx="9" cy="10.5" r="1" fill="currentColor"/><circle cx="15" cy="10.5" r="1" fill="currentColor"/><path d="M9 15c1.7 1.3 4.3 1.3 6 0" stroke-linecap="round"/></svg></span><h3>Skincare</h3><span class="sub" id="sType"></span></div>
    <div class="seg sm" role="group"><button type="button" id="amBtn" aria-pressed="true">Morning</button><button type="button" id="pmBtn" aria-pressed="false">Night</button></div>
    <div class="check" id="steps"></div>
   </div>
 
-  <div class="card" id="c-sleep">
+  <div class="card w4" id="c-sleep">
    <div class="head"><span class="ico" style="background:#E6EAF6;color:var(--sleep)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg></span><h3>Sleep</h3><span class="sub" id="slAvg"></span></div>
    <div class="tiles" style="margin-bottom:12px"><div class="tile"><b id="slWind">22:00</b><span>phone away</span></div><div class="tile"><b id="slBed">22:30</b><span>in bed</span></div><div class="tile"><b id="slWake">6:30</b><span>wake up</span></div></div>
    <p class="q">Last night I slept</p>
    <div class="chips" id="slept"></div>
   </div>
 
-  <div>
+  <div class="w12">
    <h3 style="margin:6px 2px 10px">For you today</h3>
    <div class="tips" id="tips"></div>
   </div>
@@ -310,9 +367,9 @@ details[open] summary::after{content:"–"}
 
  <!-- LOG -->
  <section class="view" id="v-log" data-view="log" hidden>
-  <div class="datebar"><button type="button" id="dPrev" aria-label="Previous day">‹</button><b id="dLabel">Today</b><button type="button" id="dNext" aria-label="Next day">›</button></div>
+  <div class="datebar w12"><button type="button" id="dPrev" aria-label="Previous day">‹</button><b id="dLabel">Today</b><button type="button" id="dNext" aria-label="Next day">›</button></div>
 
-  <div class="sec">
+  <div class="sec w6">
    <div class="head"><span class="ico" style="background:#FBE3EC;color:var(--skin)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><circle cx="9" cy="10.5" r="1" fill="currentColor"/><circle cx="15" cy="10.5" r="1" fill="currentColor"/></svg></span><h3>Skin</h3></div>
    <p class="q">Acne today</p><div class="scale" id="acne" style="--c:var(--skin)"></div>
    <p class="q">Where</p><div class="chips" id="areas" style="--c:var(--skin)"></div>
@@ -327,7 +384,7 @@ details[open] summary::after{content:"–"}
     </div></details>
   </div>
 
-  <div class="sec">
+  <div class="sec w6">
    <div class="head"><span class="ico" style="background:#ECE8F7;color:var(--body)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="5" r="2.5"/><path d="M12 8v7m0 0-3 6m3-6 3 6M7 11h10"/></svg></span><h3>Body</h3></div>
    <p class="q">Back pain</p><div class="scale" id="back" style="--c:var(--body)"></div>
    <p class="q">Energy</p><div class="scale" id="energy" style="--c:var(--body);grid-template-columns:repeat(5,1fr)"></div>
@@ -336,7 +393,7 @@ details[open] summary::after{content:"–"}
    <p class="q">Period</p><div class="chips" id="period" style="--c:var(--skin)"></div>
   </div>
 
-  <div class="sec">
+  <div class="sec w6">
    <div class="head"><span class="ico" style="background:#E5F2EA;color:var(--gut)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 4c-3 0-4 3-2 5s6 1 7 4-2 5-5 5"/><path d="M16 4c2 0 3 2 2 4"/></svg></span><h3>Gut</h3></div>
    <p class="q">Toilet</p><div class="chips" id="poop" style="--c:var(--gut)"></div>
    <p class="q">Bloating</p><div class="chips" id="bloat" style="--c:var(--gut)"></div>
@@ -345,20 +402,20 @@ details[open] summary::after{content:"–"}
    <div class="spread" style="margin-top:10px"><span class="q" style="margin:0">Sweets and sugary drinks</span><div class="stepper" data-k="sugar"><button type="button" data-d="-1" aria-label="Less">−</button><output>0</output><button type="button" data-d="1" aria-label="More">+</button></div></div>
   </div>
 
-  <div class="sec">
+  <div class="sec w6">
    <div class="head"><h3>Note</h3></div>
    <textarea id="note" placeholder="New cream, stress, food you noticed…"></textarea>
   </div>
-  <div class="savebar"><button class="btn" type="button" id="saveLog">Save log</button></div>
+  <div class="savebar w12"><button class="btn" type="button" id="saveLog">Save log</button></div>
  </section>
 
  <!-- SKIN -->
  <section class="view" id="v-skin" data-view="skin" hidden>
-  <div class="skinhero"><span class="sub" id="skFrom">Your skin type</span><b id="skType">Not measured yet</b><p id="skTip" style="font-size:14px"></p></div>
-  <div class="card"><div class="head"><h3>Moisture and oil</h3></div><div class="fig"><svg id="skChart" role="img" aria-label="Skin moisture and oil over time"></svg></div>
+  <div class="skinhero w5"><span class="sub" id="skFrom">Your skin type</span><b id="skType">Not measured yet</b><p id="skTip" style="font-size:14px"></p></div>
+  <div class="card w7"><div class="head"><h3>Moisture and oil</h3></div><div class="fig"><svg id="skChart" role="img" aria-label="Skin moisture and oil over time"></svg></div>
    <div class="key"><span><i style="background:var(--water)"></i>Cheek moisture</span><span><i style="background:var(--skin)"></i>Cheek oil</span><span><i style="background:#C98A1B"></i>T-zone oil</span></div></div>
-  <div class="card"><div class="head"><h3>Photo diary</h3><span class="sub">compare week by week</span></div><div class="photos" id="photos"></div></div>
-  <div class="card">
+  <div class="card w5"><div class="head"><h3>Photo diary</h3><span class="sub">compare week by week</span></div><div class="photos" id="photos"></div></div>
+  <div class="card w7">
    <div class="head"><h3>My products</h3></div>
    <form class="row" id="pForm" style="gap:8px;margin-bottom:10px"><label class="field" style="flex:1"><input id="pName" placeholder="Product name, e.g. Hada Labo lotion" aria-label="Product name"></label><label class="upl" style="padding:0 14px" aria-label="Add product photo"><input type="file" accept="image/*" id="pPhoto">Photo</label></form>
    <button class="btn soft" type="button" id="pAdd">Add product</button>
@@ -369,18 +426,18 @@ details[open] summary::after{content:"–"}
 
  <!-- INSIGHTS -->
  <section class="view" id="v-insights" data-view="insights" hidden>
-  <div class="card"><div class="head"><h3>Back pain and acne</h3><span class="sub">last 30 days</span></div><div class="fig"><svg id="mainChart" role="img" aria-label="Back pain and acne over time"></svg></div>
+  <div class="card w8"><div class="head"><h3>Back pain and acne</h3><span class="sub">last 30 days</span></div><div class="fig"><svg id="mainChart" role="img" aria-label="Back pain and acne over time"></svg></div>
    <div class="key"><span><i style="background:var(--body)"></i>Back pain (0–10)</span><span><i style="background:var(--skin)"></i>Acne (×2)</span></div></div>
-  <div class="card"><div class="head"><h3>What we notice</h3></div><div id="pats"></div></div>
-  <div class="card"><div class="head"><span class="dot" style="background:var(--gut)"></span><h3>Gut this week</h3></div><div class="tiles" id="gutTiles"></div></div>
-  <div class="card"><div class="head"><h3>History</h3><button class="link" type="button" id="copyAll">Copy for doctor</button></div><div class="hist" id="hist"></div></div>
+  <div class="card w4"><div class="head"><h3>What we notice</h3></div><div id="pats"></div></div>
+  <div class="card w4"><div class="head"><span class="dot" style="background:var(--gut)"></span><h3>Gut this week</h3></div><div class="tiles" id="gutTiles"></div></div>
+  <div class="card w8"><div class="head"><h3>History</h3><button class="link" type="button" id="copyAll">Copy for doctor</button></div><div class="hist" id="hist"></div></div>
  </section>
 
  <!-- ME -->
  <section class="view" id="v-me" data-view="me" hidden>
-  <div class="card profile"><span class="avatar" id="meAv"></span><div><h3 id="meName">You</h3><p class="sub" id="meEmail"></p></div></div>
+  <div class="card profile w12"><span class="avatar" id="meAv"></span><div><h3 id="meName">You</h3><p class="sub" id="meEmail"></p></div></div>
 
-  <div class="card">
+  <div class="card w6">
    <div class="head"><h3>About me</h3></div>
    <div class="form">
     <label class="field">Body weight (kg)<input type="number" id="pW" inputmode="decimal"></label>
@@ -391,20 +448,20 @@ details[open] summary::after{content:"–"}
    </div>
   </div>
 
-  <div class="card">
+  <div class="card w6">
    <div class="head"><h3>Phone reminders</h3><button class="link" type="button" id="copyAl">Copy</button></div>
    <div class="alarms" id="alarms"></div>
    <details style="margin-top:8px"><summary>How to set them</summary><p class="sub" style="margin:6px 0">iPhone: Clock → Alarm → + → pick the time → Repeat every day → add the label. For sleep, Clock → Sleep | Wake Up → turn on Wind Down.</p><p class="sub">Android: Clock → Alarm → + → pick the time → tick every day → Label. For sleep, Clock → Bedtime.</p></details>
   </div>
 
-  <div class="card"><div class="head"><h3>Doctor list</h3></div><div class="check" id="doc"></div></div>
+  <div class="card w6"><div class="head"><h3>Doctor list</h3></div><div class="check" id="doc"></div></div>
 
-  <div class="card menu">
+  <div class="card menu w6" style="align-self:start">
    <button type="button" id="toAdmin" hidden>Dashboard<span class="chev">›</span></button>
    <button type="button" data-go="privacy">Privacy policy<span class="chev">›</span></button>
    <button type="button" id="logout">Log out<span class="chev">›</span></button>
   </div>
-  <p class="note center">General wellness tips, not medical advice. For pain that gets worse or anything that worries you, see a doctor.</p>
+  <p class="note center w12">General wellness tips, not medical advice. For pain that gets worse or anything that worries you, see a doctor.</p>
  </section>
 
  <!-- DASHBOARD (owner only) -->
@@ -474,13 +531,15 @@ async function saveEntry(d,patch){entries[d]={date:d,...(entries[d]||{}),...patc
 const sorted=()=>Object.values(entries).sort((a,b)=>a.date<b.date?-1:1);
 
 /* ---------- screens ---------- */
-function chrome(on){$('.tabbar').hidden=!on;$('#top').hidden=!on}
+function chrome(on){$('.tabbar').hidden=!on;$('#top').hidden=!on;$('.side').hidden=!on}
 function screen(name){chrome(true);$('#boot').hidden=name!=='boot';$('#auth').hidden=name!=='auth';$('#app').hidden=name!=='app'}
 let view='today';
 function go(v){view=v;$$('main .view').forEach(s=>s.hidden=s.dataset.view!==v);
- $$('.tabbar button').forEach(b=>b.dataset.tab===v?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
+ $$('.tabbar button,#sidenav button').forEach(b=>b.dataset.tab===v?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
  window.scrollTo(0,0);if(v==='log')fillLog();if(v==='admin')loadAdmin();drawCharts()}
-$('.tabbar').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(b)go(b.dataset.tab)});
+$('#sidenav').innerHTML=$('.tabbar').innerHTML;
+[$('.tabbar'),$('#sidenav')].forEach(n=>n.addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(b)go(b.dataset.tab)}));
+$('#sideMe').addEventListener('click',()=>go('me'));
 $('#avatarBtn').addEventListener('click',()=>go('me'));
 let backTo='me';
 document.addEventListener('click',e=>{const p=e.target.closest('[data-go=privacy]');if(p){if(!$('#auth').hidden){backTo='auth';screen('app');chrome(false)}else backTo=view;go('privacy');return}
@@ -535,7 +594,9 @@ function renderToday(){const now=new Date(),h=now.getHours();
  const nm=(user&&user.displayName||profile.name||'').split(' ')[0];
  $('#hiName').textContent=(h<12?'Good morning':h<18?'Good afternoon':'Good evening')+(nm?', '+nm:'');
  $('#hiDate').textContent=now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
- const ini=(nm||(user&&user.email)||'?')[0].toUpperCase();$('#avatarBtn').textContent=ini;$('#meAv').textContent=ini;
+ const ini=((nm||(user&&user.email)||'')[0]||'').toUpperCase(),icon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c1.3-3.6 4.2-5.2 7.5-5.2s6.2 1.6 7.5 5.2"/></svg>';
+ ['#avatarBtn','#meAv','#sideAv'].forEach(q=>$(q).innerHTML=ini?esc(ini):icon);
+ $('#sideName').textContent=(user&&user.displayName)||profile.name||(guest?'Guest':'You');$('#sideEmail').textContent=user&&user.email?user.email:guest?'Saved on this phone':'';
  const {parts,score}=computeScore();$('#score').textContent=score;
  let g='';parts.forEach(([,v,c],i)=>{const a0=i*90+4,a1=i*90+86;g+=`<path d="${arc(75,75,62,a0,a1)}" fill="none" stroke="#F0DCE4" stroke-width="13" stroke-linecap="round"/>`;if(v>0.02)g+=`<path d="${arc(75,75,62,a0,a0+(a1-a0)*Math.min(1,v))}" fill="none" stroke="${c}" stroke-width="13" stroke-linecap="round"/>`});
  $('#ring').innerHTML=g;
