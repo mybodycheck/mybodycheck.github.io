@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- My Body Check app icon: a four-part care ring (water, skin, gut, sleep) around a leaf -->
+  <rect width="512" height="512" rx="116" fill="#A23D63"/>
+  <g fill="none" stroke-width="50" stroke-linecap="round" transform="rotate(-74 256 256)">
+    <circle cx="256" cy="256" r="148" stroke="#8FD0EA" stroke-dasharray="150 780"/>
+    <circle cx="256" cy="256" r="148" stroke="#F8BCD0" stroke-dasharray="150 780" transform="rotate(90 256 256)"/>
+    <circle cx="256" cy="256" r="148" stroke="#A9DDB9" stroke-dasharray="150 780" transform="rotate(180 256 256)"/>
+    <circle cx="256" cy="256" r="148" stroke="#BCC8F4" stroke-dasharray="150 780" transform="rotate(270 256 256)"/>
+  </g>
+  <path d="M256 176c44 30 58 92 0 160c-58-68-44-130 0-160z" fill="#fff"/>
+  <path d="M256 222c-4 26-4 52 0 84" stroke="#A23D63" stroke-width="8" stroke-linecap="round" fill="none"/>
+</svg>

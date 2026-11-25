@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <!-- Food banner: an Indian veg thali, Japanese miso soup and a green salad, seen from above.
+       Shown until a real photo is added at images/food/hero.jpg -->
+  <defs>
+    <radialGradient id="table" cx="50%" cy="40%" r="75%"><stop offset="0" stop-color="#FFF7EE"/><stop offset="1" stop-color="#F4E2D3"/></radialGradient>
+    <radialGradient id="steel" cx="45%" cy="40%" r="60%"><stop offset="0" stop-color="#F4F5F7"/><stop offset=".8" stop-color="#D9DDE3"/><stop offset="1" stop-color="#BFC5CD"/></radialGradient>
+    <radialGradient id="katori" cx="45%" cy="40%" r="60%"><stop offset="0" stop-color="#EEF0F3"/><stop offset="1" stop-color="#B9C0C9"/></radialGradient>
+    <radialGradient id="dal" cx="45%" cy="40%" r="60%"><stop offset="0" stop-color="#F6C453"/><stop offset="1" stop-color="#E09A22"/></radialGradient>
+    <radialGradient id="palak" cx="45%" cy="40%" r="60%"><stop offset="0" stop-color="#6FA84F"/><stop offset="1" stop-color="#3F7A35"/></radialGradient>
+    <radialGradient id="miso" cx="45%" cy="40%" r="60%"><stop offset="0" stop-color="#D9A05A"/><stop offset="1" stop-color="#B9732F"/></radialGradient>
+    <filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#8A4B2E" flood-opacity=".18"/></filter>
+  </defs>
+  <rect width="800" height="500" fill="url(#table)"/>
+  <!-- linen cloth -->
+  <path d="M-20 360 L260 300 L330 520 L-20 520Z" fill="#FBE3EC" opacity=".9"/>
+  <path d="M-20 380 L265 318 M-20 400 L270 337" stroke="#F3C6D6" stroke-width="3"/>
+
+  <!-- THALI -->
+  <g filter="url(#sh)">
+    <circle cx="300" cy="245" r="200" fill="url(#steel)"/>
+    <circle cx="300" cy="245" r="182" fill="none" stroke="#C9CED6" stroke-width="3"/>
+  </g>
+  <!-- rice -->
+  <g>
+    <ellipse cx="318" cy="318" rx="70" ry="54" fill="#FFFDF7"/>
+    <g fill="#EFE9DA"><ellipse cx="290" cy="300" rx="7" ry="3" transform="rotate(20 290 300)"/><ellipse cx="320" cy="292" rx="7" ry="3" transform="rotate(-30 320 292)"/><ellipse cx="345" cy="310" rx="7" ry="3" transform="rotate(50 345 310)"/><ellipse cx="305" cy="332" rx="7" ry="3" transform="rotate(-10 305 332)"/><ellipse cx="335" cy="340" rx="7" ry="3" transform="rotate(30 335 340)"/><ellipse cx="282" cy="325" rx="7" ry="3" transform="rotate(70 282 325)"/></g>
+    <path d="M330 290c8-10 20-8 22 2c-10 2-16 2-22-2z" fill="#4E9A3E"/>
+  </g>
+  <!-- roti -->
+  <g>
+    <circle cx="190" cy="300" r="62" fill="#E2B677"/><circle cx="190" cy="300" r="62" fill="none" stroke="#CF9C59" stroke-width="3"/>
+    <circle cx="214" cy="276" r="60" fill="#EAC189"/>
+    <g fill="#B97A3A" opacity=".6"><circle cx="200" cy="262" r="5"/><circle cx="228" cy="290" r="4"/><circle cx="214" cy="250" r="3"/><circle cx="236" cy="262" r="5"/><circle cx="196" cy="290" r="3"/></g>
+  </g>
+  <!-- katori: dal -->
+  <g>
+    <circle cx="225" cy="160" r="54" fill="url(#katori)"/><circle cx="225" cy="160" r="44" fill="url(#dal)"/>
+    <g fill="#B5381F"><circle cx="210" cy="150" r="4"/><circle cx="236" cy="170" r="3.5"/><circle cx="222" cy="176" r="3"/></g>
+    <g fill="#3E8B3A"><path d="M228 142c6-8 16-6 16 2c-8 2-12 2-16-2z"/><path d="M206 168c6-8 16-6 16 2c-8 2-12 2-16-2z"/></g>
+  </g>
+  <!-- katori: palak / sabzi -->
+  <g>
+    <circle cx="345" cy="130" r="54" fill="url(#katori)"/><circle cx="345" cy="130" r="44" fill="url(#palak)"/>
+    <g fill="#FFF8EC"><rect x="326" y="114" width="15" height="15" rx="3" transform="rotate(12 333 121)"/><rect x="352" y="128" width="15" height="15" rx="3" transform="rotate(-18 359 135)"/><rect x="334" y="142" width="14" height="14" rx="3" transform="rotate(30 341 149)"/></g>
+  </g>
+  <!-- katori: curd -->
+  <g>
+    <circle cx="430" cy="225" r="46" fill="url(#katori)"/><circle cx="430" cy="225" r="37" fill="#FBFAF4"/>
+    <path d="M412 218c10-8 26-8 36 2" stroke="#ECE6D6" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <circle cx="438" cy="232" r="3" fill="#C2452D"/>
+  </g>
+  <!-- salad slices on thali -->
+  <g>
+    <circle cx="420" cy="320" r="17" fill="#C8E3A0"/><circle cx="420" cy="320" r="12" fill="#E9F5D5"/>
+    <circle cx="445" cy="300" r="15" fill="#E25B45"/><path d="M438 300h14" stroke="#F7B3A6" stroke-width="3"/>
+    <path d="M398 345c10-14 30-12 30 0c-12 4-20 4-30 0z" fill="#9C4FA0"/>
+  </g>
+
+  <!-- MISO SOUP -->
+  <g filter="url(#sh)">
+    <circle cx="640" cy="150" r="96" fill="#2E1F22"/>
+    <circle cx="640" cy="150" r="86" fill="#7E2130"/>
+    <circle cx="640" cy="150" r="72" fill="url(#miso)"/>
+  </g>
+  <g fill="#FFFDF6"><rect x="606" y="120" width="22" height="22" rx="3" transform="rotate(10 617 131)"/><rect x="650" y="156" width="22" height="22" rx="3" transform="rotate(-14 661 167)"/><rect x="618" y="168" width="20" height="20" rx="3" transform="rotate(24 628 178)"/></g>
+  <g fill="#2F5A2A"><path d="M655 112c16-6 30 4 26 14c-12 0-20-4-26-14z"/><path d="M596 160c8-12 24-12 26-2c-10 6-18 6-26 2z"/></g>
+  <g fill="none" stroke="#8CC063" stroke-width="4"><circle cx="672" cy="136" r="6"/><circle cx="640" cy="198" r="5"/><circle cx="600" cy="138" r="5"/></g>
+  <!-- chopsticks -->
+  <g stroke-linecap="round">
+    <path d="M540 290 L770 205" stroke="#8B5A35" stroke-width="9"/>
+    <path d="M548 306 L776 226" stroke="#A06A40" stroke-width="9"/>
+  </g>
+
+  <!-- GREEN SALAD BOWL -->
+  <g filter="url(#sh)">
+    <circle cx="650" cy="385" r="92" fill="#FFFFFF"/>
+    <circle cx="650" cy="385" r="80" fill="#EAF3E2"/>
+  </g>
+  <g>
+    <path d="M590 370c20-40 70-44 84-10c-30 12-58 16-84 10z" fill="#6DB24F"/>
+    <path d="M620 420c10-36 62-40 74-8c-26 12-50 14-74 8z" fill="#4E9A3E"/>
+    <path d="M640 350c24-26 66-14 64 16c-26 2-48-4-64-16z" fill="#8BC56A"/>
+    <circle cx="612" cy="404" r="14" fill="#E25B45"/><circle cx="690" cy="408" r="12" fill="#E8735E"/>
+    <circle cx="660" cy="382" r="16" fill="#D8EBC0"/><circle cx="660" cy="382" r="10" fill="#F2F8E8"/>
+    <g fill="#F1E3C2"><circle cx="632" cy="380" r="4"/><circle cx="680" cy="370" r="4"/><circle cx="650" cy="428" r="4"/></g>
+  </g>
+
+  <!-- leaves -->
+  <g fill="#6DB24F" opacity=".85">
+    <path d="M60 80c30-30 70-20 70 10c-30 10-50 10-70-10z"/>
+    <path d="M520 470c20-26 56-22 60 2c-24 8-42 8-60-2z"/>
+    <path d="M30 460c18-24 50-20 54 2c-22 8-38 8-54-2z"/>
+  </g>
+  <g fill="#E25B45"><circle cx="110" cy="130" r="9"/><circle cx="128" cy="118" r="7"/></g>
+</svg>
