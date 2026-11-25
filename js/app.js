@@ -23,6 +23,7 @@ const PAT=[
  [/^Your skin type · from (.+)$/,m=>`あなたの肌タイプ（${tr(m[1])}の記録より）`],[/^\(before ([\d.]+)\)$/,m=>`（先週 ${m[1]}）`],[/^updated (.+)$/,m=>`更新 ${m[1]}`],[/^until (.+)$/,m=>`${m[1]}まで`],
  [/^Added (.+?)(?: · (.+))?$/,m=>`追加：${VJ[m[1]]||m[1]}`+(m[2]?' · '+m[2].replace(/(better|same|worse|itchy or red) (\d+)/g,(_,w,n)=>VJ[w]+' '+n).replace(/, /g,'、'):'')]
 ];
+(window.BC_JA_PAT||[]).forEach(x=>PAT.push(x));
 function tr(s){if(LANG!=='ja'||s==null)return s;const k=String(s).trim();if(!k)return s;let j=JA[k];if(j==null)for(const [re,f] of PAT){const m=k.match(re);if(m){j=f(m);break}}return j==null?s:String(s).replace(k,j)}
 const T=tr;
 const ORIG=new WeakMap(),ATTRS=['placeholder','aria-label','alt','title'];
@@ -53,13 +54,15 @@ function burst(anchor){if(calm()||!anchor||anchor.offsetParent===null)return;con
  document.body.appendChild(b);setTimeout(()=>b.remove(),1100)}
 
 /* ---------- screens ---------- */
-function chrome(on){$('.tabbar').hidden=!on;$('#top').hidden=!on;$('.side').hidden=!on}
+function chrome(on){$('.tabbar').hidden=!on;$('#top').hidden=!on;$('.side').hidden=!on;$('#fab').hidden=!on}
 function screen(name){chrome(true);$('#boot').hidden=name!=='boot';$('#auth').hidden=name!=='auth';$('#app').hidden=name!=='app'}
 let view='today';
 let ringAnim=true;
 function go(v){const changed=view!==v||!$('[data-view='+v+']').classList.contains('enter');view=v;$$('main .view').forEach(s=>{s.hidden=s.dataset.view!==v;if(s.dataset.view===v&&changed){s.classList.remove('enter');void s.offsetWidth;s.classList.add('enter')}});
  if(v==='today'&&changed){ringAnim=true;renderToday()}
- $$('.tabbar button,#sidenav button').forEach(b=>b.dataset.tab===v?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
+ const tabOf={caredetail:'care',skin:'care',log:'today',plans:'me',admin:'me',privacy:'me',onboard:'today'}[v]||v;
+ $$('.tabbar button,#sidenav button').forEach(b=>b.dataset.tab===tabOf?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
+ if(v==='caredetail')renderCareDetail();if(v==='food')renderFood();if(v==='care')renderCare();if(v==='insights')renderStreak();
  window.scrollTo(0,0);if(v==='log')fillLog();if(v==='admin')loadAdmin();drawCharts()}
 $('#sidenav').innerHTML=$('.tabbar').innerHTML;
 [$('.tabbar'),$('#sidenav')].forEach(n=>n.addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(b)go(b.dataset.tab)}));
@@ -86,8 +89,8 @@ scale('energy',[[1,1,'Drained'],[2,2,'Tired'],[3,3,'OK'],[4,4,'Good'],[5,5,'Grea
 chips('areas',['Cheeks','Jaw','Chin','Forehead','Nose']);chips('hair',[['Low','Little'],'Normal','High','Very high'],1);chips('teeth',['Fine','Sensitive','Gums bleed','Tooth pain']);
 chips('lips',['Fine','Dry','Cracked','Bleeding'],1);chips('period',['On my period']);chips('poop',['None','Hard','Normal','Loose'],1);chips('bloat',[['No','Not at all'],'A little','A lot'],1);chips('ferm',['Curd (dahi)','Idli or dosa','Natto','Miso','Yogurt','Kimchi','Tsukemono']);
 const DIETS=['Vegetarian','Eggetarian','Non-veg','Jain'],CONCERNS=['Acne','Dry skin','Hair fall','Chapped lips','Back pain','Body ache','Teeth','Tummy','Tiredness'],WAKES=['5:30','6:00','6:30','7:00','7:30','8:00'];
-chips('feed',['Yes','No'],1);chips('diet',DIETS,1);chips('concerns',CONCERNS);chips('wake',WAKES,1);chips('slept',['Under 5h','5–6h','6–7h','7–8h','8h+'],1);
-chips('obDiet',DIETS,1);chips('obConcerns',CONCERNS);chips('obWake',WAKES,1);chips('obFeed',['Yes','No'],1);chips('gpPlan',['Free','Gold','Platinum','Diamond'],1);setPicked('gpPlan',['Gold']);
+chips('feed',['Yes','No'],1);chips('diet',DIETS,1);chips('cuisine',['Indian','Japanese','Indian × Japan']);chips('concerns',CONCERNS);chips('wake',WAKES,1);chips('slept',['Under 5h','5–6h','6–7h','7–8h','8h+'],1);
+chips('obDiet',DIETS,1);chips('obCuisine',['Indian','Japanese','Indian × Japan']);chips('obConcerns',CONCERNS);chips('obWake',WAKES,1);chips('obFeed',['Yes','No'],1);chips('gpPlan',['Free','Gold','Platinum','Diamond'],1);setPicked('gpPlan',['Gold']);
 $$('.stepper[data-k]').forEach(s=>s.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const o=s.querySelector('output');o.value=o.textContent=Math.max(0,Math.min(15,(+o.textContent||0)+ +b.dataset.d))}));
 
 /* ---------- plan logic ---------- */
@@ -114,7 +117,7 @@ function routine(){const st=skinType(lastSkin()),t=st?st[0]:null,L=sorted().reve
  if((profile.concerns||[]).includes('Chapped lips')){am.push('Lip balm, fragrance-free');pm.push('Lip balm, fragrance-free')}
  return{am,pm,type:t,acne}}
 function computeScore(){const t=entries[today()]||{},w=waterPlan(),r=routine();
- const water=Math.min(1,(t.water||0)/w.G),log=t.acne!=null||t.back!=null||t.poop?1:0;
+ const water=Math.min(1,(t.water||0)/w.G),log=t.energy!=null||t.acne!=null||t.back!=null||t.poop?1:0;
  const sk=((t.am||[]).length/r.am.length+(t.pm||[]).length/r.pm.length)/2,sleep=t.sleep!=null?Math.min(1,t.sleep/7.5):0;
  return{parts:[['Water',water,'var(--water)',`${t.water||0}/${w.G}`,'c-water'],['Check-in',log,'var(--body)',log?'Done':'Not yet','log'],['Skincare',sk,'var(--skin)',`${(t.am||[]).length+(t.pm||[]).length}/${r.am.length+r.pm.length}`,'c-skin'],['Sleep',sleep,'var(--sleep)',t.sleep!=null?t.sleep+'h':'Not yet','c-sleep']],score:Math.round((water*.35+log*.25+sk*.2+sleep*.2)*100)}}
 
@@ -136,7 +139,7 @@ function renderToday(){const now=new Date(),h=now.getHours();
  /* up next */
  const t=entries[today()]||{},w=waterPlan(),done=t.water||0,need=Math.max(0,w.by-done),r=routine();let nx;
  if(need>0&&w.cur>=0)nx=[`Drink ${need} glass${need>1?'es':''} of water`,`before ${w.end}:00`,'+ Glass','water'];
- else if(!(t.acne!=null||t.back!=null||t.poop))nx=['Log how you feel today','takes 1 minute','Open log','log'];
+ else if(!(t.energy!=null||t.acne!=null||t.back!=null||t.poop))nx=['Check in: how do you feel?','takes 30 seconds','Check in','log'];
  else if(h>=19&&(t.pm||[]).length<r.pm.length)nx=['Night skincare',`${r.pm.length-(t.pm||[]).length} steps left`,'Show','pm'];
  else if(h<12&&(t.am||[]).length<r.am.length)nx=['Morning skincare',`${r.am.length-(t.am||[]).length} steps left`,'Show','am'];
  else if(done<w.G)nx=['You are on track',`${w.G-done} glasses left today`,'+ Glass','water'];
@@ -165,10 +168,10 @@ function renderToday(){const now=new Date(),h=now.getHours();
  if(c.includes('Hair fall'))tips.push(['var(--body)','Hair',veg?'Protein at every meal: dal, paneer, tofu. Iron: spinach, hijiki.':egg?'Protein at every meal: eggs, dal, paneer, tofu. Iron: spinach, hijiki.':'Protein at every meal: eggs, fish, tofu. Iron: spinach, hijiki.']);
  if(c.includes('Tiredness'))tips.push(['var(--body)','Energy','A blood test for iron, B12 and vitamin D can show why you feel tired.']);
  tips.push(['var(--sleep)','Sleep','Phone away 30 minutes before bed.']);
- $('#tips').innerHTML=tips.map(([col,a,b])=>`<div class="tip"><b><span class="dot" style="background:${col}"></span>${a}</b><p>${b}</p></div>`).join('')}
-$('#legend').addEventListener('click',e=>{const b=e.target.closest('[data-to]');if(!b)return;const t=b.dataset.to;if(t==='log')go('log');else $('#'+t).scrollIntoView({behavior:'smooth',block:'center'})});
+ $('#tips').innerHTML=tips.slice(0,2).map(([col,a,b])=>`<div class="tip"><b><span class="dot" style="background:${col}"></span>${a}</b><p>${b}</p></div>`).join('')}
+$('#legend').addEventListener('click',e=>{const b=e.target.closest('[data-to]');if(!b)return;const t=b.dataset.to;if(t==='log')openCheckin();else $('#'+t).scrollIntoView({behavior:'smooth',block:'center'})});
 $('#next').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
- if(a==='water')addWater(1);else if(a==='log')go('log');else{$('#'+(a==='pm'?'pmBtn':'amBtn')).click();$('#c-skin').scrollIntoView({behavior:'smooth',block:'center'})}});
+ if(a==='water')addWater(1);else if(a==='log')openCheckin();else{$('#'+(a==='pm'?'pmBtn':'amBtn')).click();$('#c-skin').scrollIntoView({behavior:'smooth',block:'center'})}});
 function addWater(n){const v=Math.max(0,Math.min(glasses(),((entries[today()]||{}).water||0)+n));popDrop=n>0?v-1:-1;saveEntry(today(),{water:v});popDrop=-1;if(n>0){toast(v>=glasses()?'Water goal reached':'Glass added');if(v>=glasses())burst($('#drops'))}}
 $('#wPlus').addEventListener('click',()=>addWater(1));$('#wMinus').addEventListener('click',()=>addWater(-1));
 $('#drops').addEventListener('click',e=>{const b=e.target.closest('.drop');if(!b)return;const i=+b.dataset.i,d=(entries[today()]||{}).water||0,nv=d===i+1?i:i+1;popDrop=nv>d?i:-1;saveEntry(today(),{water:nv});popDrop=-1;if(nv>=glasses()&&d<glasses())burst($('#drops'))});
@@ -252,24 +255,24 @@ const ro=new ResizeObserver(()=>drawCharts());['#mainChart','#skChart'].forEach(
 const DOC=[['blood','Blood test: vitamin D, calcium, iron (ferritin), B12, thyroid'],['ortho','Back: orthopedic clinic (整形外科) or physiotherapist'],['dr','Ask about the stomach muscle gap after pregnancy (diastasis recti)'],['derm','Skin: dermatologist (皮膚科) for cheek and jaw acne'],['dent','Teeth: dentist (歯科) check-up'],['gutdr','Gut: if toilet problems last weeks, 消化器内科'],['show','Show your history (Insights → Copy) to each doctor']];
 let alarmList=[];
 function renderMe(){$('#meName').textContent=(user&&user.displayName)||profile.name||(guest?'Guest':'You');$('#meEmail').textContent=user&&user.email?user.email:guest?'Saved on this phone only':'';
- if(document.activeElement!==$('#pW'))$('#pW').value=profile.weight||'';setPicked('feed',profile.feed==null?[]:[profile.feed?'Yes':'No']);setPicked('diet',profile.diet?[profile.diet]:[]);setPicked('concerns',profile.concerns);setPicked('wake',[profile.wake||'6:30']);
+ if(document.activeElement!==$('#pW'))$('#pW').value=profile.weight||'';setPicked('feed',profile.feed==null?[]:[profile.feed?'Yes':'No']);setPicked('diet',profile.diet?[profile.diet]:[]);setPicked('cuisine',cuisines());setPicked('concerns',profile.concerns);setPicked('wake',[profile.wake||'6:30']);
  const pl=curPlan();$('#meBadge').hidden=pl==='Free';if(pl!=='Free'){$('#meBadge').textContent=pl;$('#meBadge').style.setProperty('--pc',PLAN_C[pl])}
  const wk=(profile.wake||'6:30').split(':').map(Number),wm=wk[0]*60+wk[1];
  alarmList=[[hm(wm),'Wake up: 2 glasses of water'],[hm(Math.max(wm+150,600)),'Water: 1–2 glasses'],['12:30','Lunch, water, 15-minute walk'],['15:00','Water and a stretch'],['18:00','Last water of the day'],[hm(wm-510),'Wind down: phone away, night skincare'],[hm(wm-480),'Bedtime']];
  $('#alarms').innerHTML=alarmList.map(([a,b])=>`<div><b>${a}</b><span>${b}</span></div>`).join('');
  $('#doc').innerHTML=DOC.map(([k,t])=>`<label><input type="checkbox" data-k="${k}" ${checks[k]?'checked':''}><span>${t}</span></label>`).join('');
  $('#toAdmin').hidden=!isAdmin();$('#logout').textContent=guest&&!user?'Log in or sign up':'Log out'}
-$('#pSave').addEventListener('click',async()=>{const w=num($('#pW').value);profile={...profile,weight:w||null,feed:picked('feed')[0]?picked('feed')[0]==='Yes':null,diet:picked('diet')[0]||profile.diet||null,concerns:picked('concerns'),wake:picked('wake')[0]||'6:30',lang:LANG};localSave();renderAll();toast('Saved');await put('profile',profile)});
+$('#pSave').addEventListener('click',async()=>{const w=num($('#pW').value);profile={...profile,weight:w||null,feed:picked('feed')[0]?picked('feed')[0]==='Yes':null,diet:picked('diet')[0]||profile.diet||null,cuisines:picked('cuisine').length?picked('cuisine'):(profile.cuisines||null),concerns:picked('concerns'),wake:picked('wake')[0]||'6:30',lang:LANG};localSave();renderAll();toast('Saved');await put('profile',profile)});
 
 /* ---------- onboarding (first time only) ---------- */
 let obShown=false;
 function maybeOnboard(){if(obShown||profile.onboarded||$('#app').hidden||view==='privacy')return;obShown=true;
- setPicked('obDiet',profile.diet?[profile.diet]:[]);setPicked('obConcerns',profile.concerns||[]);setPicked('obWake',[profile.wake||'6:30']);setPicked('obFeed',profile.feed==null?[]:[profile.feed?'Yes':'No']);
+ setPicked('obDiet',profile.diet?[profile.diet]:[]);setPicked('obCuisine',cuisines());setPicked('obConcerns',profile.concerns||[]);setPicked('obWake',[profile.wake||'6:30']);setPicked('obFeed',profile.feed==null?[]:[profile.feed?'Yes':'No']);
  chrome(false);go('onboard')}
 $('#obStart').addEventListener('click',async()=>{const er=$('#obErr');er.textContent='';
  if(!picked('obDiet')[0]){er.textContent='Please choose what you eat.';return}
  if(!$('#obAgree').checked){er.textContent='Please tick the box to continue.';return}
- profile={...profile,diet:picked('obDiet')[0],concerns:picked('obConcerns'),wake:picked('obWake')[0]||'6:30',feed:picked('obFeed')[0]?picked('obFeed')[0]==='Yes':(profile.feed??null),lang:LANG,onboarded:true,agreed:today()};
+ profile={...profile,diet:picked('obDiet')[0],cuisines:picked('obCuisine').length?picked('obCuisine'):defaultCuisines(),concerns:picked('obConcerns'),wake:picked('obWake')[0]||'6:30',feed:picked('obFeed')[0]?picked('obFeed')[0]==='Yes':(profile.feed??null),lang:LANG,onboarded:true,agreed:today()};
  localSave();chrome(true);renderAll();go('today');setTimeout(()=>burst($('#ring')),500);await put('profile',profile)});
 
 /* ---------- plans ---------- */
@@ -294,7 +297,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-lang]');if
 $('#doc').addEventListener('change',e=>{const k=e.target.dataset.k;checks[k]=e.target.checked;localSave();put('checklist',{...checks})});
 $('#copyAl').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(alarmList.map(([a,b])=>a+'  '+b).join('\n'));toast('Copied')}catch(x){toast('Copy is not allowed here')}});
 
-function renderAll(){renderToday();renderSkin();renderInsights();renderMe();renderPlans();drawCharts()}
+function renderAll(){renderToday();renderCheckin();renderPlate();renderSkin();renderInsights();renderStreak();renderMe();renderPlans();renderCare();if(view==='food')renderFood();drawCharts()}
 
 /* ---------- accounts ---------- */
 let mode='login';
@@ -358,6 +361,135 @@ $('#gpSave').addEventListener('click',async()=>{const er=$('#gpErr'),id=$('#gpId
  if(!id){$('#gpId').focus();er.textContent='Paste the member ID';return}if(!pl)return;
  try{await db.collection('plans').doc(id).set({plan:pl,until:$('#gpUntil').value||null,set:today()});toast('Plan saved');$('#gpId').value='';$('#gpUntil').value='';setPicked('gpPlan',['Gold']);loadPlanList();if(id===uid)loadMyPlan()}
  catch(e){er.textContent='Could not save. Add the plans rule in Firebase first.'}});
+
+
+/* ---------- v5: food, care, check-in, progress ---------- */
+const DATA=window.BC_DATA||{dishes:[],care:[],photos:[]};
+const Lx=o=>(o&&(o[LANG]||o.en))||{};
+const GOODS=[['skin','Skin'],['hair','Hair'],['gut','Gut'],['energy','Energy'],['bones','Bones & teeth']];
+const GOODL=Object.fromEntries(GOODS);
+const CUI={'Indian':'in','Japanese':'jp','Indian × Japan':'fu'};
+const C2G={'Acne':'skin','Dry skin':'skin','Chapped lips':'skin','Hair fall':'hair','Tummy':'gut','Tiredness':'energy','Teeth':'bones','Back pain':'bones','Body ache':'energy'};
+const defaultCuisines=()=>LANG==='ja'?['Japanese']:['Indian','Indian × Japan'];
+const cuisines=()=>profile.cuisines&&profile.cuisines.length?profile.cuisines:defaultCuisines();
+function dietOk(d){const dt=profile.diet;if(dt==='Jain')return d.diet==='veg'&&d.jain;if(dt==='Vegetarian')return d.diet==='veg';if(dt==='Eggetarian')return d.diet!=='non';return true}
+function dishList(good){const cs=cuisines().map(c=>CUI[c]);return DATA.dishes.filter(d=>cs.includes(d.c)&&dietOk(d)&&(!good||d.good.includes(good)))}
+const dishById=id=>DATA.dishes.find(d=>d.id===id);
+const hash=s=>{let h=7;for(const c of s)h=(h*31+c.charCodeAt(0))>>>0;return h};
+function dishArt(d){const h=hash(d.id),light=/^#(F|E[89A-F])/i.test(d.col),g=['#4E9A3E','#6DB24F','#3E8B3A'][h%3],r=['#C2452D','#E25B45','#B5381F'][h%3];
+ const dots=[0,1,2,3,4].map(i=>{const a=(h>>(i*3))%360*Math.PI/180,rr=8+((h>>(i*2))%14);return`<circle cx="${50+Math.cos(a)*rr}" cy="${50+Math.sin(a)*rr}" r="${i%2?2.2:3}" fill="${i%2?r:g}"/>`}).join('');
+ const food=d.kind==='plate'?`<circle cx="50" cy="52" r="38" fill="#fff" stroke="#E7DCD2" stroke-width="1.5"/><ellipse cx="50" cy="52" rx="24" ry="18" fill="${d.col}" ${light?'stroke="#E2D6C3" stroke-width="1.5"':''}/>`
+  :`<circle cx="50" cy="52" r="36" fill="#fff" stroke="#E7DCD2" stroke-width="1.5"/><circle cx="50" cy="52" r="28" fill="${d.col}" ${light?'stroke="#E2D6C3" stroke-width="1.5"':''}/>`;
+ const photo=(DATA.photos||[]).includes(d.id)?`<img src="images/food/${d.id}.jpg" alt="" loading="lazy" onerror="this.remove()">`:'';
+ return`<div class="dishart"><svg viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" fill="#F7EFE6"/><ellipse cx="52" cy="58" rx="40" ry="34" fill="#EADBCB" opacity=".5"/>${food}${dots}<path d="M12 18c6-6 14-4 14 2c-6 2-10 2-14-2z" fill="${g}" opacity=".8"/></svg>${photo}</div>`}
+const dietTag=d=>`<span class="tag ${d.diet}">${({veg:'Veg',egg:'Egg',non:'Non-veg'})[d.diet]}</span>`;
+const goodTags=d=>d.good.map(g=>`<span class="tag">${GOODL[g]}</span>`).join('');
+
+/* today's plate: a different dish each day, matched to your concerns, diet and cuisines */
+function plateDish(){const want=(profile.concerns||[]).map(c=>C2G[c]).filter(Boolean),all=dishList();if(!all.length)return null;
+ const pref=all.filter(d=>d.good.some(g=>want.includes(g))),pool=pref.length?pref:all;return pool[hash(today())%pool.length]}
+function renderPlate(){const d=plateDish(),el=$('#plate');if(!d){el.innerHTML='<p class="sub">Choose the food you like in Me to see ideas.</p>';return}
+ const t=Lx(d),ate=((entries[today()]||{}).ate||[]).includes(d.id);
+ el.innerHTML=`<div class="pl"><button type="button" class="plainbtn" data-dish="${d.id}" aria-label="${esc(t.n)}">${dishArt(d)}</button><div data-notr><h4>${esc(t.n)}</h4><p>${esc(t.d)}</p><div class="tags">${dietTag(d)}${goodTags(d)}</div>
+ <div class="row" style="margin-top:10px;gap:8px;flex-wrap:wrap"><button class="btn small soft" type="button" data-dish="${d.id}">${T('See dish')}</button><button class="btn small" type="button" data-ate="${d.id}">${ate?T('Eaten today ✓'):T('I ate this')}</button></div></div></div>`}
+async function toggleAte(id){const cur=new Set((entries[today()]||{}).ate||[]);const on=!cur.has(id);on?cur.add(id):cur.delete(id);await saveEntry(today(),{ate:[...cur]});if(on)toast('Added to today')}
+
+/* sheet */
+function openSheet(html,mount){$('#sheetBody').innerHTML=html;$('#sheetWrap').hidden=false;document.body.style.overflow='hidden';if(mount)mount();const x=$('#sheetWrap .sheetx');x&&x.focus()}
+function closeSheet(){$('#sheetWrap').hidden=true;document.body.style.overflow='';$('#sheetBody').innerHTML=''}
+$('#sheetWrap').addEventListener('click',e=>{if(e.target.closest('[data-close]'))closeSheet()});
+addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#sheetWrap').hidden)closeSheet()});
+
+function openDish(id){const d=dishById(id);if(!d)return;const t=Lx(d),ate=((entries[today()]||{}).ate||[]).includes(d.id);
+ openSheet(`${dishArt(d)}<div data-notr><h2 id="sheetTitle">${esc(t.n)}</h2><div class="tags">${dietTag(d)}${goodTags(d)}</div><p style="margin-top:10px">${esc(t.d)}</p></div>
+ <p class="q">${T('Main ingredients')}</p><p class="sub" data-notr>${esc(t.ing)}</p>
+ <p class="q">${T('Where to buy in Japan')}</p><p class="sub" data-notr>${esc(t.buy)}</p>
+ <button class="btn" type="button" data-ate="${d.id}">${ate?T('Eaten today ✓'):T('I ate this today')}</button>
+ <p class="note center" style="margin-top:12px">${T('Home food ideas for everyday balance, not a diet or treatment.')}</p>`)}
+
+/* check-in sheet: one tap for how you feel, then only your own concerns */
+const FACES=[[1,'😣','Drained'],[2,'🙁','Tired'],[3,'😐','OK'],[4,'🙂','Good'],[5,'😄','Great']];
+function facesHtml(sel){return FACES.map(([v,f,l])=>`<button type="button" data-face="${v}" aria-pressed="${sel===v}"><i>${f}</i>${l}</button>`).join('')}
+function ciSections(){const c=profile.concerns||[],has=k=>c.includes(k),none=!c.length,S=[];
+ if(none||has('Acne')||has('Dry skin'))S.push(['ciAcne','Skin today',[['0','Clear'],['1','A few spots'],['3','Some spots'],['5','Many spots']],1]);
+ if(has('Chapped lips'))S.push(['ciLips','Lips today',['Fine','Dry','Cracked','Bleeding'],1]);
+ if(has('Hair fall'))S.push(['ciHair','Hair fall',[['Low','Little'],'Normal','High','Very high'],1]);
+ if(none||has('Back pain')||has('Body ache'))S.push(['ciBack','Back or body pain',[['0','None'],['2','Mild'],['4','Medium'],['6','Strong'],['8','Severe']],1]);
+ if(none||has('Tummy'))S.push(['ciPoop','Toilet',['None','Hard','Normal','Loose'],1],['ciBloat','Bloating',[['No','Not at all'],'A little','A lot'],1]);
+ if(has('Teeth'))S.push(['ciTeeth','Teeth',['Fine','Sensitive','Gums bleed','Tooth pain'],0]);
+ S.push(['ciPeriod','Period',['On my period'],0]);return S}
+function openCheckin(face){const e=entries[today()]||{},S=ciSections();let energy=face??e.energy??null;
+ openSheet(`<h2 id="sheetTitle">${T('Check in')}</h2><p class="sub">${T('30 seconds. Skip anything you like.')}</p>
+ <p class="q">${T('How do you feel today?')}</p><div class="faces" id="ciFaces">${facesHtml(energy)}</div>
+ ${S.map(([id,q])=>`<p class="q">${T(q)}</p><div class="chips" id="${id}" style="--c:var(--body)"></div>`).join('')}
+ <p class="q">${T('Note')}</p><textarea id="ciNote" placeholder="New cream, stress, food you noticed…">${esc(e.notes||'')}</textarea>
+ <button class="btn" type="button" id="ciSave">${T('Save check-in')}</button>
+ <div class="center"><button class="link" type="button" id="ciMore">${T('More details: photo and skin meter')}</button></div>`,()=>{
+  S.forEach(([id,,items,single])=>chips(id,items,single));
+  setPicked('ciAcne',e.acne!=null?[String(e.acne>=4?5:e.acne>=2?3:e.acne)]:[]);setPicked('ciLips',e.lips?[e.lips]:[]);setPicked('ciHair',e.hair?[e.hair]:[]);
+  setPicked('ciBack',e.back!=null?[String(Math.min(8,Math.round(e.back/2)*2))]:[]);setPicked('ciPoop',e.poop?[e.poop]:[]);setPicked('ciBloat',e.bloat?[e.bloat]:[]);setPicked('ciTeeth',e.teeth||[]);setPicked('ciPeriod',e.period?['On my period']:[]);
+  $('#ciFaces').addEventListener('click',ev=>{const b=ev.target.closest('[data-face]');if(!b)return;energy=+b.dataset.face;$('#ciFaces').innerHTML=facesHtml(energy)});
+  $('#ciMore').addEventListener('click',()=>{closeSheet();logDate=today();go('log')});
+  $('#ciSave').addEventListener('click',async()=>{const first=!(e.energy!=null||e.acne!=null||e.back!=null||e.poop),p={energy,notes:$('#ciNote').value.trim()};
+   const one=id=>{if(!$('#'+id))return undefined;const v=picked(id);return v.length?v[0]:undefined};
+   const a=one('ciAcne');if(a!==undefined)p.acne=+a;const b=one('ciBack');if(b!==undefined)p.back=+b;
+   const l=one('ciLips');if(l!==undefined)p.lips=l;const h=one('ciHair');if(h!==undefined)p.hair=h;const po=one('ciPoop');if(po!==undefined)p.poop=po;const bl=one('ciBloat');if(bl!==undefined)p.bloat=bl;
+   if($('#ciTeeth')&&picked('ciTeeth').length)p.teeth=picked('ciTeeth');p.period=picked('ciPeriod').length>0;
+   closeSheet();await saveEntry(today(),p);toast('Check-in saved');if(first)setTimeout(()=>burst($('#ring')),250)})})}
+function renderCheckin(){const e=entries[today()]||{},done=e.energy!=null||e.acne!=null||e.back!=null||!!e.poop;
+ $('#faces').innerHTML=facesHtml(e.energy??null);$('#ciState').textContent=done?'Checked in today ✓ Tap a face to update.':'Tap a face to start. Takes 30 seconds.'}
+$('#faces').addEventListener('click',e=>{const b=e.target.closest('[data-face]');if(b)openCheckin(+b.dataset.face)});
+$('#fab').addEventListener('click',()=>openCheckin());
+
+/* care */
+let careKey='skin';
+const last7=()=>{const out=[];for(let i=6;i>=0;i--){const d=shift(today(),-i);out.push({d,e:entries[d]||null})}return out};
+function careStatus(k){const w=last7(),E=w.map(x=>x.e).filter(Boolean),n=f=>E.filter(f).length;let text,lvl;
+ if(k==='skin'){const a=avg(E,e=>e.acne);text=a==null?'No check-ins this week':'Acne this week: '+a.toFixed(1)+'/5';lvl=w.map(x=>!x.e||x.e.acne==null?0:x.e.acne<=1?2:x.e.acne<=3?1:0.5)}
+ else if(k==='hair'){const c=n(e=>e.hair==='High'||e.hair==='Very high');text=E.some(e=>e.hair)?c+(c===1?' high hair-fall day this week':' high hair-fall days this week'):'No check-ins this week';lvl=w.map(x=>!x.e||!x.e.hair?0:/High/.test(x.e.hair)?0.5:2)}
+ else if(k==='lips'){const c=n(e=>e.lips&&e.lips!=='Fine');text=E.some(e=>e.lips)?c+(c===1?' dry-lip day this week':' dry-lip days this week'):'No check-ins this week';lvl=w.map(x=>!x.e||!x.e.lips?0:x.e.lips==='Fine'?2:x.e.lips==='Dry'?1:0.5)}
+ else if(k==='back'){const a=avg(E,e=>e.back);text=a==null?'No check-ins this week':'Pain this week: '+a.toFixed(1)+'/10';lvl=w.map(x=>!x.e||x.e.back==null?0:x.e.back<=2?2:x.e.back<=5?1:0.5)}
+ else if(k==='gut'){const c=n(e=>e.poop==='Normal');text=E.some(e=>e.poop)?c+'/7 normal toilet days':'No check-ins this week';lvl=w.map(x=>!x.e||!x.e.poop?0:x.e.poop==='Normal'?2:1)}
+ else{const a=avg(E,e=>e.sleep);text=a==null?'No sleep logged this week':'Sleep this week: '+a.toFixed(1)+'h';lvl=w.map(x=>!x.e||x.e.sleep==null?0:x.e.sleep>=7?2:x.e.sleep>=6?1:0.5)}
+ return{text,lvl,days:w.map(x=>x.d)}}
+function renderCare(){const mine=profile.concerns||[],list=[...DATA.care].sort((a,b)=>(b.concern.some(c=>mine.includes(c))?1:0)-(a.concern.some(c=>mine.includes(c))?1:0));
+ $('#careGrid').innerHTML=list.map(a=>{const t=Lx(a),st=careStatus(a.k),m=a.concern.some(c=>mine.includes(c));
+  return`<button type="button" class="ctile${m?' mine':''}" data-care="${a.k}" style="--tint:${a.tint};--col:${a.col}"><span class="dot"></span><b data-notr>${esc(t.t)}</b><span class="sub" data-notr>${esc(t.s)}</span><span class="st">${esc(st.text)}</span></button>`}).join('');
+ if(view==='caredetail')renderCareDetail()}
+function renderCareDetail(){const a=DATA.care.find(x=>x.k===careKey);if(!a)return;const t=Lx(a),en=a.en,st=careStatus(a.k),done=new Set(((entries[today()]||{}).care||{})[a.k]||[]);
+ const wd=st.days.map((d,i)=>`<div><i class="${st.lvl[i]>=2?'ok':st.lvl[i]>=1?'mid':''}"></i>${new Date(d+'T12:00:00').toLocaleDateString(LOC(),{weekday:'narrow'})}</div>`).join('');
+ const foods=dishList(a.good).slice(0,8),src=(en.src||[]);
+ $('#careDetail').innerHTML=`<div class="chero" style="--tint:${a.tint};--col:${a.col}"><h2 data-notr>${esc(t.t)}</h2><p class="sub" data-notr>${esc(t.s)}</p><p class="st">${esc(st.text)}</p><div class="week" style="--col:${a.col}">${wd}</div></div>
+ ${t.emergency?`<div class="emer"><h3>${T('Get urgent help now if you have back pain and:')}</h3><ul data-notr>${t.emergency.map(x=>`<li>${esc(x)}</li>`).join('')}</ul><p>${T('In Japan call 119, or #7119 for advice where available.')}</p></div>`:''}
+ <div class="card"><div class="head"><h3>${T("Today's routine")}</h3><span class="sub">${done.size}/${t.routine.length}</span></div><div class="check" id="crList" data-notr>${t.routine.map((r,i)=>`<label><input type="checkbox" data-i="${i}" ${done.has(i)?'checked':''}><span>${esc(r)}</span></label>`).join('')}</div></div>
+ ${t.stretch?`<div class="card learn"><div class="head"><h3>${T('Gentle stretches')}</h3></div><ul data-notr>${t.stretch.map(x=>`<li>${esc(x)}</li>`).join('')}</ul><p class="sub" style="margin-top:8px">${T('Stop if pain gets worse. Ask a physiotherapist for exercises made for you.')}</p></div>`:''}
+ ${foods.length?`<div class="card"><div class="head"><h3>${T('Foods that help')}</h3><button class="link" type="button" data-tab="food">${T('All dishes ›')}</button></div><div class="minidish">${foods.map(d=>`<button type="button" data-dish="${d.id}">${dishArt(d)}<span data-notr>${esc(Lx(d).n)}</span></button>`).join('')}</div></div>`:''}
+ <div class="card learn"><div class="head"><h3>${T('1-minute read')}</h3></div><p data-notr style="font-size:14.5px">${esc(t.learn)}</p></div>
+ <div class="doc"><h3>${T('See a doctor if')}</h3><ul data-notr>${t.doctor.map(x=>`<li>${esc(x)}</li>`).join('')}</ul><p class="sub" style="margin-top:8px;color:#8A2540" data-notr>${esc(T('Where to go:'))} ${esc(t.where)}</p>${src.length?`<div class="srcs">${T('Sources:')} ${src.map(([l,u])=>`<a href="${u}" target="_blank" rel="noopener">${esc(l)}</a>`).join('')}</div>`:''}</div>
+ ${a.k==='skin'?`<button class="card linkcard" type="button" data-tab="skin"><span><b>${T('Skin type, photos and products')}</b></span><span class="chev">›</span></button>`:''}
+ <p class="note center">${T('General wellness tips, not medical advice.')}</p>`}
+$('#careGrid').addEventListener('click',e=>{const b=e.target.closest('[data-care]');if(!b)return;careKey=b.dataset.care;go('caredetail')});
+$('#careDetail').addEventListener('change',async e=>{const i=+e.target.dataset.i;if(Number.isNaN(i))return;const c={...((entries[today()]||{}).care||{})},s=new Set(c[careKey]||[]);e.target.checked?s.add(i):s.delete(i);c[careKey]=[...s].sort();
+ const a=DATA.care.find(x=>x.k===careKey),n=Lx(a).routine.length;await saveEntry(today(),{care:c});if(e.target.checked&&s.size>=n)burst($('#careDetail .chero'))});
+
+/* food */
+let foodGood='all';
+function renderFood(){const cs=cuisines();setPicked('fdCuisine',cs);setPicked('fdGood',[foodGood]);
+ const list=dishList(foodGood==='all'?null:foodGood);
+ $('#fdSub').textContent=LANG==='ja'?(cs.includes('Indian')?'Indian food is on. Tap to change.':'Japanese food first. Want Indian food too? Tap “Indian”.'):(cs.includes('Japanese')?'Japanese food is on. Tap to change.':'Indian food first. Want Japanese food too? Tap “Japanese”.');
+ $('#dishGrid').innerHTML=list.length?list.map(d=>{const t=Lx(d);return`<button type="button" class="dish" data-dish="${d.id}">${dishArt(d)}<div data-notr><h4>${esc(t.n)}</h4><p>${esc(t.d)}</p></div><div class="tags">${dietTag(d)}</div></button>`}).join(''):`<p class="empty">${T('No dishes match. Try another filter.')}</p>`}
+chips('fdCuisine',['Indian','Japanese','Indian × Japan']);chips('fdGood',[['all','All'],...GOODS],1);
+$('#fdCuisine').addEventListener('change',async()=>{let cs=picked('fdCuisine');if(!cs.length){cs=defaultCuisines();toast('Choose at least one')}profile={...profile,cuisines:cs};localSave();renderFood();renderPlate();renderMe();if(uid)await put('profile',profile)});
+$('#fdGood').addEventListener('change',()=>{foodGood=picked('fdGood')[0]||'all';renderFood()});
+document.addEventListener('click',e=>{const a=e.target.closest('[data-ate]');if(a){e.preventDefault();const id=a.dataset.ate;toggleAte(id).then(()=>{if(!$('#sheetWrap').hidden)openDish(id)});return}
+ const d=e.target.closest('[data-dish]');if(d){openDish(d.dataset.dish);return}
+ const bt=e.target.closest('[data-backto]');if(bt){go(bt.dataset.backto);return}
+ const tb=e.target.closest('[data-tab]');if(tb&&!tb.closest('.tabbar,#sidenav')){go(tb.dataset.tab)}});
+
+/* progress: streak and week */
+function renderStreak(){let s=0;for(let i=0;i<400;i++){const e=entries[shift(today(),-i)];if(e&&(e.energy!=null||e.acne!=null||e.back!=null||e.poop||e.water)){s++}else if(i>0)break}
+ const w=last7().map(x=>x.e).filter(Boolean),ci=w.filter(e=>e.energy!=null||e.acne!=null||e.back!=null||e.poop).length,wa=avg(w,e=>e.water),ate=w.reduce((n,e)=>n+((e.ate||[]).length),0);
+ $('#streak').innerHTML=`<div class="tile"><b>${s}</b><span>day streak</span></div><div class="tile"><b>${ci}/7</b><span>check-ins this week</span></div><div class="tile"><b>${wa==null?'–':wa.toFixed(1)}</b><span>glasses a day</span></div><div class="tile"><b>${ate}</b><span>healthy dishes eaten</span></div>`}
 
 /* ---------- start ---------- */
 trAll();
