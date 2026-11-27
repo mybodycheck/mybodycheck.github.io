@@ -36,6 +36,14 @@ new MutationObserver(ms=>{if(LANG!=='ja')return;ms.forEach(m=>m.addedNodes.forEa
 
 /* ---------- state ---------- */
 let profile={},products={},entries={},checks={},photos={};
+/* region: Japan users see Japanese food and Japan clinics; everyone else sees Indian food and general words */
+const TZ=(()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone||''}catch(e){return''}})();
+const region=()=>profile.region||(TZ==='Asia/Tokyo'?'japan':TZ==='Asia/Kolkata'||TZ==='Asia/Calcutta'?'india':LANG==='ja'?'japan':'other');
+const inJP=()=>region()==='japan';
+/* English outside Japan: drop Japanese words in brackets and Japan-only prices */
+function loc(x){if(typeof x!=='string'||LANG==='ja')return x;const J=inJP();
+ x=x.replace(/₹(\d+) \/ ¥(\d+)/g,(m,a,b)=>J?'¥'+b:'₹'+a);if(J)return x;
+ return x.replace(/\s*[（(][^)）]*[\u3040-\u30ff\u4e00-\u9fff][^)）]*[)）]/g,'').replace(/,? ?[\u3040-\u30ff\u4e00-\u9fff]+$/,' a gastroenterologist').replace(/Indian and Japanese dishes/g,'Indian home dishes').replace(/ \+ Japanese/g,'')}
 let auth=null,db=null,uid=null,user=null,unsub=null,first=false,guest=false,triedAnon=false;
 try{guest=localStorage.getItem('bc-guest')==='1';profile=JSON.parse(localStorage.getItem('bc-profile')||'{}');products=JSON.parse(localStorage.getItem('bc-products')||'{}');entries=JSON.parse(localStorage.getItem('bc-entries')||'{}');checks=JSON.parse(localStorage.getItem('bc-checks')||'{}');photos=JSON.parse(localStorage.getItem('bc-photos')||'{}')}catch(e){}
 function localSave(){try{localStorage.setItem('bc-profile',JSON.stringify(profile));localStorage.setItem('bc-products',JSON.stringify(products));localStorage.setItem('bc-entries',JSON.stringify(entries));localStorage.setItem('bc-checks',JSON.stringify(checks));const pp={};Object.keys(photos).sort().slice(-30).forEach(k=>pp[k]=photos[k]);localStorage.setItem('bc-photos',JSON.stringify(pp))}catch(e){}}
@@ -88,9 +96,10 @@ scale('back',[[0,0,'None'],[2,2,'Mild'],[4,4,'Medium'],[6,6,'Strong'],[8,8,'Seve
 scale('energy',[[1,1,'Drained'],[2,2,'Tired'],[3,3,'OK'],[4,4,'Good'],[5,5,'Great']]);
 chips('areas',['Cheeks','Jaw','Chin','Forehead','Nose']);chips('hair',[['Low','Little'],'Normal','High','Very high'],1);chips('teeth',['Fine','Sensitive','Gums bleed','Tooth pain']);
 chips('lips',['Fine','Dry','Cracked','Bleeding'],1);chips('period',['On my period']);chips('poop',['None','Hard','Normal','Loose'],1);chips('bloat',[['No','Not at all'],'A little','A lot'],1);chips('ferm',['Curd (dahi)','Idli or dosa','Natto','Miso','Yogurt','Kimchi','Tsukemono']);
-const DIETS=['Vegetarian','Eggetarian','Non-veg','Jain'],CONCERNS=['Acne','Dry skin','Hair fall','Chapped lips','Back pain','Body ache','Teeth','Tummy','Tiredness'],WAKES=['5:30','6:00','6:30','7:00','7:30','8:00'];
-chips('feed',['Yes','No'],1);chips('diet',DIETS,1);chips('cuisine',['Indian','Japanese','Indian × Japan']);chips('concerns',CONCERNS);chips('wake',WAKES,1);chips('slept',['Under 5h','5–6h','6–7h','7–8h','8h+'],1);
-chips('obDiet',DIETS,1);chips('obCuisine',['Indian','Japanese','Indian × Japan']);chips('obConcerns',CONCERNS);chips('obWake',WAKES,1);chips('obFeed',['Yes','No'],1);chips('gpPlan',['Free','Gold','Platinum','Diamond'],1);setPicked('gpPlan',['Gold']);
+const REGIONS=[['japan','Japan'],['india','India'],['other','Other country']];
+const DIETS=['Vegetarian','Eggetarian','Non-veg','Jain'],CONCERNS=['Acne','Dry skin','Hair fall','Chapped lips','Back pain','Body ache','Teeth','Tummy','Tiredness','Periods'],WAKES=['5:30','6:00','6:30','7:00','7:30','8:00'];
+chips('feed',['Yes','No'],1);chips('diet',DIETS,1);chips('cuisine',['Indian','Japanese','Both'],1);chips('region',REGIONS,1);chips('concerns',CONCERNS);chips('wake',WAKES,1);chips('slept',['Under 5h','5–6h','6–7h','7–8h','8h+'],1);
+chips('obDiet',DIETS,1);chips('obCuisine',['Indian','Japanese','Both'],1);chips('obRegion',REGIONS,1);chips('obConcerns',CONCERNS);chips('obWake',WAKES,1);chips('obFeed',['Yes','No'],1);chips('gpPlan',['Free','Gold','Platinum','Diamond'],1);setPicked('gpPlan',['Gold']);
 $$('.stepper[data-k]').forEach(s=>s.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const o=s.querySelector('output');o.value=o.textContent=Math.max(0,Math.min(15,(+o.textContent||0)+ +b.dataset.d))}));
 
 /* ---------- plan logic ---------- */
@@ -159,13 +168,14 @@ function renderToday(){const now=new Date(),h=now.getHours();
  const sa=avg(sorted().slice(-7),e=>e.sleep);$('#slAvg').textContent=sa==null?'':`avg ${sa.toFixed(1)}h`;
  /* tips */
  const c=profile.concerns||[],L=sorted().slice(-7),veg=profile.diet==='Vegetarian'||profile.diet==='Jain',egg=profile.diet==='Eggetarian';
- const tips=[['var(--gut)','Fermented food','One today: curd (dahi), natto, miso soup or plain yogurt.'],['var(--gut)','Fibre','Five servings of vegetables and fruit. Dal, seaweed and mushrooms count.'],['var(--body)','Move','A 15-minute walk after lunch helps digestion and your back.']];
+ const J=inJP(),tips=[['var(--gut)','Fermented food',J?'One today: curd (dahi), natto, miso soup or plain yogurt.':'One today: curd (dahi), buttermilk (chaas), idli or dosa.'],['var(--gut)','Fibre',J?'Five servings of vegetables and fruit. Dal, seaweed and mushrooms count.':'Five servings of vegetables and fruit. Dal, sprouts and salad count.'],['var(--body)','Move','A 15-minute walk after lunch helps digestion and your back.']];
  if(c.includes('Back pain')||(avg(L,e=>e.back)||0)>=3)tips.unshift(['var(--body)','Back care','Lift with bent knees and a straight back. A physio can give exercises made for you.']);
  const last=sorted().reverse()[0];if(last&&(last.poop==='Hard'||last.poop==='None'))tips.unshift(['var(--gut)','Toilet','Two extra glasses of water and a kiwi or prunes today.']);
  if(c.includes('Chapped lips'))tips.unshift(['var(--skin)','Lips','Fragrance-free lip balm, try not to lick your lips, and use a humidifier in winter.']);
  if(c.includes('Body ache'))tips.push(['var(--body)','Body ache','Gentle stretches and short walks often help. If pain is strong or lasts weeks, see a doctor.']);
- if(c.includes('Teeth'))tips.push(['var(--body)','Teeth',veg||egg?'Calcium foods: paneer, curd, tofu, sesame, komatsuna.':'Calcium foods: tofu, small fish, yogurt, komatsuna.']);
- if(c.includes('Hair fall'))tips.push(['var(--body)','Hair',veg?'Protein at every meal: dal, paneer, tofu. Iron: spinach, hijiki.':egg?'Protein at every meal: eggs, dal, paneer, tofu. Iron: spinach, hijiki.':'Protein at every meal: eggs, fish, tofu. Iron: spinach, hijiki.']);
+ if(c.includes('Teeth'))tips.push(['var(--body)','Teeth',!J?'Calcium foods: curd, paneer, ragi, sesame (til).':veg||egg?'Calcium foods: paneer, curd, tofu, sesame, komatsuna.':'Calcium foods: tofu, small fish, yogurt, komatsuna.']);
+ if(c.includes('Hair fall'))tips.push(['var(--body)','Hair',!J?(veg?'Protein at every meal: dal, paneer, sprouts. Iron: spinach, rajma, jaggery, dates.':'Protein at every meal: eggs, dal, paneer. Iron: spinach, rajma, jaggery, dates.'):veg?'Protein at every meal: dal, paneer, tofu. Iron: spinach, hijiki.':egg?'Protein at every meal: eggs, dal, paneer, tofu. Iron: spinach, hijiki.':'Protein at every meal: eggs, fish, tofu. Iron: spinach, hijiki.']);
+ if(c.includes('Periods'))tips.push(['var(--berry)','Period care','Warmth on your tummy and iron-rich food help on period days. Log your days in Care → Period and cycle.']);
  if(c.includes('Tiredness'))tips.push(['var(--body)','Energy','A blood test for iron, B12 and vitamin D can show why you feel tired.']);
  tips.push(['var(--sleep)','Sleep','Phone away 30 minutes before bed.']);
  $('#tips').innerHTML=tips.slice(0,2).map(([col,a,b])=>`<div class="tip"><b><span class="dot" style="background:${col}"></span>${a}</b><p>${b}</p></div>`).join('')}
@@ -211,7 +221,7 @@ function renderSkin(){const ls=lastSkin(),st=skinType(ls);$('#skType').textConte
   return`<div class="prod">${p.img?`<img src="${p.img}" alt="">`:'<span class="ph"></span>'}<div><div class="spread"><b data-notr>${esc(p.name)}</b><button class="link" type="button" data-pd="${p.id}" style="font-size:13px;color:var(--muted)">Remove</button></div>
   <p class="sub">Added ${dayLabel(p.added).toLowerCase()}${cnt.length?' · '+cnt.map(([r,n])=>r.toLowerCase()+' '+n).join(', '):''}</p>
   <div class="react" style="--c:var(--skin)">${VERD.map(r=>`<button type="button" class="chip" data-p="${p.id}" data-r="${r}" aria-pressed="${!!(td&&td.r===r)}">${r}</button>`).join('')}</div>
-  ${bad?'<p class="warn">Your skin reacted badly. Stop using it for now. If redness lasts over 2 days, see a dermatologist (皮膚科).</p>':''}</div></div>`}).join('')}
+  ${bad?'<p class="warn">Your skin reacted badly. Stop using it for now. If redness lasts over 2 days, see a dermatologist'+(inJP()?' (皮膚科)':'')+'.</p>':''}</div></div>`}).join('')}
 async function saveProd(p){products[p.id]=p;localSave();renderSkin();await put(p.id,p)}
 $('#pPhoto').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{prodImg=await shrink(f,200,.6);toast('Photo added')}catch(x){toast('Could not use this photo')}});
 $('#pAdd').addEventListener('click',async()=>{const n=$('#pName').value.trim();if(!n){$('#pName').focus();toast('Type the product name');return}
@@ -255,24 +265,26 @@ const ro=new ResizeObserver(()=>drawCharts());['#mainChart','#skChart'].forEach(
 const DOC=[['blood','Blood test: vitamin D, calcium, iron (ferritin), B12, thyroid'],['ortho','Back: orthopedic clinic (整形外科) or physiotherapist'],['dr','Ask about the stomach muscle gap after pregnancy (diastasis recti)'],['derm','Skin: dermatologist (皮膚科) for cheek and jaw acne'],['dent','Teeth: dentist (歯科) check-up'],['gutdr','Gut: if toilet problems last weeks, 消化器内科'],['show','Show your history (Insights → Copy) to each doctor']];
 let alarmList=[];
 function renderMe(){$('#meName').textContent=(user&&user.displayName)||profile.name||(guest?'Guest':'You');$('#meEmail').textContent=user&&user.email?user.email:guest?'Saved on this phone only':'';
- if(document.activeElement!==$('#pW'))$('#pW').value=profile.weight||'';setPicked('feed',profile.feed==null?[]:[profile.feed?'Yes':'No']);setPicked('diet',profile.diet?[profile.diet]:[]);setPicked('cuisine',cuisines());setPicked('concerns',profile.concerns);setPicked('wake',[profile.wake||'6:30']);
+ if(document.activeElement!==$('#pW'))$('#pW').value=profile.weight||'';setPicked('feed',profile.feed==null?[]:[profile.feed?'Yes':'No']);setPicked('diet',profile.diet?[profile.diet]:[]);setPicked('cuisine',[foodMode()]);setPicked('region',[region()]);$('#cuisineRow').hidden=!showFoodMode();setPicked('concerns',profile.concerns);setPicked('wake',[profile.wake||'6:30']);
  const pl=curPlan();$('#meBadge').hidden=pl==='Free';if(pl!=='Free'){$('#meBadge').textContent=pl;$('#meBadge').style.setProperty('--pc',PLAN_C[pl])}
  const wk=(profile.wake||'6:30').split(':').map(Number),wm=wk[0]*60+wk[1];
  alarmList=[[hm(wm),'Wake up: 2 glasses of water'],[hm(Math.max(wm+150,600)),'Water: 1–2 glasses'],['12:30','Lunch, water, 15-minute walk'],['15:00','Water and a stretch'],['18:00','Last water of the day'],[hm(wm-510),'Wind down: phone away, night skincare'],[hm(wm-480),'Bedtime']];
  $('#alarms').innerHTML=alarmList.map(([a,b])=>`<div><b>${a}</b><span>${b}</span></div>`).join('');
- $('#doc').innerHTML=DOC.map(([k,t])=>`<label><input type="checkbox" data-k="${k}" ${checks[k]?'checked':''}><span>${t}</span></label>`).join('');
+ $('#doc').innerHTML=DOC.map(([k,t])=>`<label><input type="checkbox" data-k="${k}" ${checks[k]?'checked':''}><span>${esc(loc(t))}</span></label>`).join('');
  $('#toAdmin').hidden=!isAdmin();$('#logout').textContent=guest&&!user?'Log in or sign up':'Log out'}
-$('#pSave').addEventListener('click',async()=>{const w=num($('#pW').value);profile={...profile,weight:w||null,feed:picked('feed')[0]?picked('feed')[0]==='Yes':null,diet:picked('diet')[0]||profile.diet||null,cuisines:picked('cuisine').length?picked('cuisine'):(profile.cuisines||null),concerns:picked('concerns'),wake:picked('wake')[0]||'6:30',lang:LANG};localSave();renderAll();toast('Saved');await put('profile',profile)});
+$('#pSave').addEventListener('click',async()=>{const w=num($('#pW').value);profile={...profile,weight:w||null,feed:picked('feed')[0]?picked('feed')[0]==='Yes':null,diet:picked('diet')[0]||profile.diet||null,food:picked('cuisine')[0]||foodMode(),region:picked('region')[0]||region(),concerns:picked('concerns'),wake:picked('wake')[0]||'6:30',lang:LANG};localSave();renderAll();toast('Saved');await put('profile',profile)});
 
+$('#region').addEventListener('change',()=>{const r=picked('region')[0];$('#cuisineRow').hidden=!(r==='japan'||LANG==='ja')});
+$('#obRegion').addEventListener('change',()=>{const r=picked('obRegion')[0];$('#obCuisineRow').hidden=!(r==='japan'||LANG==='ja')});
 /* ---------- onboarding (first time only) ---------- */
 let obShown=false;
 function maybeOnboard(){if(obShown||profile.onboarded||$('#app').hidden||view==='privacy')return;obShown=true;
- setPicked('obDiet',profile.diet?[profile.diet]:[]);setPicked('obCuisine',cuisines());setPicked('obConcerns',profile.concerns||[]);setPicked('obWake',[profile.wake||'6:30']);setPicked('obFeed',profile.feed==null?[]:[profile.feed?'Yes':'No']);
+ setPicked('obDiet',profile.diet?[profile.diet]:[]);setPicked('obCuisine',[foodMode()]);setPicked('obRegion',[region()]);$('#obCuisineRow').hidden=!showFoodMode();setPicked('obConcerns',profile.concerns||[]);setPicked('obWake',[profile.wake||'6:30']);setPicked('obFeed',profile.feed==null?[]:[profile.feed?'Yes':'No']);
  chrome(false);go('onboard')}
 $('#obStart').addEventListener('click',async()=>{const er=$('#obErr');er.textContent='';
  if(!picked('obDiet')[0]){er.textContent='Please choose what you eat.';return}
  if(!$('#obAgree').checked){er.textContent='Please tick the box to continue.';return}
- profile={...profile,diet:picked('obDiet')[0],cuisines:picked('obCuisine').length?picked('obCuisine'):defaultCuisines(),concerns:picked('obConcerns'),wake:picked('obWake')[0]||'6:30',feed:picked('obFeed')[0]?picked('obFeed')[0]==='Yes':(profile.feed??null),lang:LANG,onboarded:true,agreed:today()};
+ profile={...profile,diet:picked('obDiet')[0],region:picked('obRegion')[0]||region(),food:picked('obCuisine')[0]||foodMode(),concerns:picked('obConcerns'),wake:picked('obWake')[0]||'6:30',feed:picked('obFeed')[0]?picked('obFeed')[0]==='Yes':(profile.feed??null),lang:LANG,onboarded:true,agreed:today()};
  localSave();chrome(true);renderAll();go('today');setTimeout(()=>burst($('#ring')),500);await put('profile',profile)});
 
 /* ---------- plans ---------- */
@@ -284,7 +296,7 @@ const PLANS=[['Free','Free forever',['Daily check-in, water and sleep','Basic sk
 let myPlan=null;
 const curPlan=()=>myPlan&&myPlan.plan&&(!myPlan.until||myPlan.until>=today())?myPlan.plan:'Free';
 function renderPlans(){const cur=curPlan();
- $('#planCards').innerHTML=PLANS.map(([n,price,feats])=>`<div class="plan${n===cur?' cur':''}" style="--pc:${PLAN_C[n]}">${n===cur?'<span class="tag">Current plan</span>':''}<div class="pname"><i></i>${n}</div><div class="price">${price}</div><ul>${feats.map(f=>`<li>${f}</li>`).join('')}</ul>${n==='Free'?'':`<button class="btn" type="button" disabled>${n===cur?'Current plan':'Coming soon'}</button>`}${n===cur&&myPlan&&myPlan.until?`<p class="sub">until ${myPlan.until}</p>`:''}</div>`).join('');
+ $('#planCards').innerHTML=PLANS.map(([n,price,feats])=>`<div class="plan${n===cur?' cur':''}" style="--pc:${PLAN_C[n]}">${n===cur?'<span class="tag">Current plan</span>':''}<div class="pname"><i></i>${n}</div><div class="price">${loc(price)}</div><ul>${feats.map(f=>`<li>${loc(f)}</li>`).join('')}</ul>${n==='Free'?'':`<button class="btn" type="button" disabled>${n===cur?'Current plan':'Coming soon'}</button>`}${n===cur&&myPlan&&myPlan.until?`<p class="sub">until ${myPlan.until}</p>`:''}</div>`).join('');
  $('#memberId').textContent=uid||'–'}
 async function loadMyPlan(){if(!db||!uid)return;try{const d=await db.collection('plans').doc(uid).get();myPlan=d.exists?d.data():null}catch(e){myPlan=null}renderMe();renderPlans()}
 $('#toPlans').addEventListener('click',()=>{backTo='me';go('plans')});
@@ -365,13 +377,16 @@ $('#gpSave').addEventListener('click',async()=>{const er=$('#gpErr'),id=$('#gpId
 
 /* ---------- v5: food, care, check-in, progress ---------- */
 const DATA=window.BC_DATA||{dishes:[],care:[],photos:[]};
-const Lx=o=>(o&&(o[LANG]||o.en))||{};
+function Lx(o){const b=(o&&(o[LANG]||o.en))||{};if(LANG==='ja'||inJP())return b;const r={...b,...(o&&o.out||{})};
+ for(const k in r){if(typeof r[k]==='string')r[k]=loc(r[k]);else if(Array.isArray(r[k])&&typeof r[k][0]==='string')r[k]=r[k].map(loc)}return r}
 const GOODS=[['skin','Skin'],['hair','Hair'],['gut','Gut'],['energy','Energy'],['bones','Bones & teeth']];
 const GOODL=Object.fromEntries(GOODS);
 const CUI={'Indian':'in','Japanese':'jp','Indian × Japan':'fu'};
-const C2G={'Acne':'skin','Dry skin':'skin','Chapped lips':'skin','Hair fall':'hair','Tummy':'gut','Tiredness':'energy','Teeth':'bones','Back pain':'bones','Body ache':'energy'};
-const defaultCuisines=()=>LANG==='ja'?['Japanese']:['Indian','Indian × Japan'];
-const cuisines=()=>profile.cuisines&&profile.cuisines.length?profile.cuisines:defaultCuisines();
+const C2G={'Acne':'skin','Dry skin':'skin','Chapped lips':'skin','Hair fall':'hair','Tummy':'gut','Tiredness':'energy','Teeth':'bones','Back pain':'bones','Body ache':'energy','Periods':'energy'};
+/* one food choice: Indian | Japanese | Both. Outside Japan (in English) only Indian food is shown */
+const showFoodMode=()=>inJP()||LANG==='ja';
+function foodMode(){if(profile.food)return profile.food;const c=profile.cuisines;if(c&&c.length){const i=c.includes('Indian'),j=c.includes('Japanese');return i&&j?'Both':j?'Japanese':'Indian'}return LANG==='ja'?'Japanese':'Indian'}
+function cuisines(){if(!showFoodMode())return['Indian'];const m=foodMode();return m==='Japanese'?['Japanese']:m==='Both'?['Indian','Japanese','Indian × Japan']:inJP()?['Indian','Indian × Japan']:['Indian']}
 function dietOk(d){const dt=profile.diet;if(dt==='Jain')return d.diet==='veg'&&d.jain;if(dt==='Vegetarian')return d.diet==='veg';if(dt==='Eggetarian')return d.diet!=='non';return true}
 function dishList(good){const cs=cuisines().map(c=>CUI[c]);return DATA.dishes.filter(d=>cs.includes(d.c)&&dietOk(d)&&(!good||d.good.includes(good)))}
 const dishById=id=>DATA.dishes.find(d=>d.id===id);
@@ -403,7 +418,7 @@ addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#sheetWrap').hidden)clos
 function openDish(id){const d=dishById(id);if(!d)return;const t=Lx(d),ate=((entries[today()]||{}).ate||[]).includes(d.id);
  openSheet(`${dishArt(d)}<div data-notr><h2 id="sheetTitle">${esc(t.n)}</h2><div class="tags">${dietTag(d)}${goodTags(d)}</div><p style="margin-top:10px">${esc(t.d)}</p></div>
  <p class="q">${T('Main ingredients')}</p><p class="sub" data-notr>${esc(t.ing)}</p>
- <p class="q">${T('Where to buy in Japan')}</p><p class="sub" data-notr>${esc(t.buy)}</p>
+ ${inJP()&&t.buy?`<p class="q">${T('Where to buy in Japan')}</p><p class="sub" data-notr>${esc(t.buy)}</p>`:''}
  <button class="btn" type="button" data-ate="${d.id}">${ate?T('Eaten today ✓'):T('I ate this today')}</button>
  <p class="note center" style="margin-top:12px">${T('Home food ideas for everyday balance, not a diet or treatment.')}</p>`)}
 
@@ -417,7 +432,7 @@ function ciSections(){const c=profile.concerns||[],has=k=>c.includes(k),none=!c.
  if(none||has('Back pain')||has('Body ache'))S.push(['ciBack','Back or body pain',[['0','None'],['2','Mild'],['4','Medium'],['6','Strong'],['8','Severe']],1]);
  if(none||has('Tummy'))S.push(['ciPoop','Toilet',['None','Hard','Normal','Loose'],1],['ciBloat','Bloating',[['No','Not at all'],'A little','A lot'],1]);
  if(has('Teeth'))S.push(['ciTeeth','Teeth',['Fine','Sensitive','Gums bleed','Tooth pain'],0]);
- S.push(['ciPeriod','Period',['On my period'],0]);return S}
+ if(has('Periods'))S.push(['ciFlow','Period today',[['None','No period'],'Light','Medium','Heavy'],1]);else S.push(['ciPeriod','Period',['On my period'],0]);return S}
 function openCheckin(face){const e=entries[today()]||{},S=ciSections();let energy=face??e.energy??null;
  openSheet(`<h2 id="sheetTitle">${T('Check in')}</h2><p class="sub">${T('30 seconds. Skip anything you like.')}</p>
  <p class="q">${T('How do you feel today?')}</p><div class="faces" id="ciFaces">${facesHtml(energy)}</div>
@@ -427,14 +442,14 @@ function openCheckin(face){const e=entries[today()]||{},S=ciSections();let energ
  <div class="center"><button class="link" type="button" id="ciMore">${T('More details: photo and skin meter')}</button></div>`,()=>{
   S.forEach(([id,,items,single])=>chips(id,items,single));
   setPicked('ciAcne',e.acne!=null?[String(e.acne>=4?5:e.acne>=2?3:e.acne)]:[]);setPicked('ciLips',e.lips?[e.lips]:[]);setPicked('ciHair',e.hair?[e.hair]:[]);
-  setPicked('ciBack',e.back!=null?[String(Math.min(8,Math.round(e.back/2)*2))]:[]);setPicked('ciPoop',e.poop?[e.poop]:[]);setPicked('ciBloat',e.bloat?[e.bloat]:[]);setPicked('ciTeeth',e.teeth||[]);setPicked('ciPeriod',e.period?['On my period']:[]);
+  setPicked('ciBack',e.back!=null?[String(Math.min(8,Math.round(e.back/2)*2))]:[]);setPicked('ciPoop',e.poop?[e.poop]:[]);setPicked('ciBloat',e.bloat?[e.bloat]:[]);setPicked('ciTeeth',e.teeth||[]);setPicked('ciPeriod',e.period?['On my period']:[]);setPicked('ciFlow',e.period?[e.flow||'Medium']:e.flow==='None'?['None']:[]);
   $('#ciFaces').addEventListener('click',ev=>{const b=ev.target.closest('[data-face]');if(!b)return;energy=+b.dataset.face;$('#ciFaces').innerHTML=facesHtml(energy)});
   $('#ciMore').addEventListener('click',()=>{closeSheet();logDate=today();go('log')});
   $('#ciSave').addEventListener('click',async()=>{const first=!(e.energy!=null||e.acne!=null||e.back!=null||e.poop),p={energy,notes:$('#ciNote').value.trim()};
    const one=id=>{if(!$('#'+id))return undefined;const v=picked(id);return v.length?v[0]:undefined};
    const a=one('ciAcne');if(a!==undefined)p.acne=+a;const b=one('ciBack');if(b!==undefined)p.back=+b;
    const l=one('ciLips');if(l!==undefined)p.lips=l;const h=one('ciHair');if(h!==undefined)p.hair=h;const po=one('ciPoop');if(po!==undefined)p.poop=po;const bl=one('ciBloat');if(bl!==undefined)p.bloat=bl;
-   if($('#ciTeeth')&&picked('ciTeeth').length)p.teeth=picked('ciTeeth');p.period=picked('ciPeriod').length>0;
+   if($('#ciTeeth')&&picked('ciTeeth').length)p.teeth=picked('ciTeeth');if($('#ciFlow')){const f=one('ciFlow');if(f!==undefined){p.flow=f;p.period=f!=='None'}}else p.period=picked('ciPeriod').length>0;
    closeSheet();await saveEntry(today(),p);toast('Check-in saved');if(first)setTimeout(()=>burst($('#ring')),250)})})}
 function renderCheckin(){const e=entries[today()]||{},done=e.energy!=null||e.acne!=null||e.back!=null||!!e.poop;
  $('#faces').innerHTML=facesHtml(e.energy??null);$('#ciState').textContent=done?'Checked in today ✓ Tap a face to update.':'Tap a face to start. Takes 30 seconds.'}
@@ -450,36 +465,72 @@ function careStatus(k){const w=last7(),E=w.map(x=>x.e).filter(Boolean),n=f=>E.fi
  else if(k==='lips'){const c=n(e=>e.lips&&e.lips!=='Fine');text=E.some(e=>e.lips)?c+(c===1?' dry-lip day this week':' dry-lip days this week'):'No check-ins this week';lvl=w.map(x=>!x.e||!x.e.lips?0:x.e.lips==='Fine'?2:x.e.lips==='Dry'?1:0.5)}
  else if(k==='back'){const a=avg(E,e=>e.back);text=a==null?'No check-ins this week':'Pain this week: '+a.toFixed(1)+'/10';lvl=w.map(x=>!x.e||x.e.back==null?0:x.e.back<=2?2:x.e.back<=5?1:0.5)}
  else if(k==='gut'){const c=n(e=>e.poop==='Normal');text=E.some(e=>e.poop)?c+'/7 normal toilet days':'No check-ins this week';lvl=w.map(x=>!x.e||!x.e.poop?0:x.e.poop==='Normal'?2:1)}
+ else if(k==='cycle'){const ci=cycleInfo();text=ci.text;lvl=w.map(x=>x.e&&x.e.period?1:0)}
  else{const a=avg(E,e=>e.sleep);text=a==null?'No sleep logged this week':'Sleep this week: '+a.toFixed(1)+'h';lvl=w.map(x=>!x.e||x.e.sleep==null?0:x.e.sleep>=7?2:x.e.sleep>=6?1:0.5)}
  return{text,lvl,days:w.map(x=>x.d)}}
 function renderCare(){const mine=profile.concerns||[],list=[...DATA.care].sort((a,b)=>(b.concern.some(c=>mine.includes(c))?1:0)-(a.concern.some(c=>mine.includes(c))?1:0));
  $('#careGrid').innerHTML=list.map(a=>{const t=Lx(a),st=careStatus(a.k),m=a.concern.some(c=>mine.includes(c));
   return`<button type="button" class="ctile${m?' mine':''}" data-care="${a.k}" style="--tint:${a.tint};--col:${a.col}"><span class="dot"></span><b data-notr>${esc(t.t)}</b><span class="sub" data-notr>${esc(t.s)}</span><span class="st">${esc(st.text)}</span></button>`}).join('');
  if(view==='caredetail')renderCareDetail()}
+/* ---------- v6: period and cycle ---------- */
+const dayDiff=(a,b)=>Math.round((new Date(b+'T12:00:00')-new Date(a+'T12:00:00'))/864e5);
+let calMonth=null;
+function cycleInfo(){const days=Object.keys(entries).filter(d=>entries[d]&&entries[d].period&&d<=today()).sort(),starts=[],runs=[];let prev=null;
+ for(const d of days){if(!prev||dayDiff(prev,d)>2){starts.push(d);runs.push(1)}else runs[runs.length-1]=dayDiff(starts[starts.length-1],d)+1;prev=d}
+ const gaps=[];for(let i=1;i<starts.length;i++){const g=dayDiff(starts[i-1],starts[i]);if(g>=15&&g<=60)gaps.push(g)}
+ const mean=a=>a.reduce((x,y)=>x+y,0)/a.length,cyc=gaps.length?Math.round(mean(gaps.slice(-6))):28,per=runs.length>1?Math.max(2,Math.min(8,Math.round(mean(runs.slice(0,-1).slice(-6))))):5;
+ const last=starts[starts.length-1]||null,on=!!(entries[today()]||{}).period;
+ if(!last)return{none:true,cyc,per,starts,gaps,runs,pred:new Set(),text:'Tap your period days in the calendar'};
+ const dayN=dayDiff(last,today())+1;let next=shift(last,cyc);const late=dayDiff(next,today());
+ const pred=new Set(),base=late>0?today():next;for(let c=0;c<3;c++)for(let i=0;i<per;i++){const d=shift(base,c*cyc+i);if(d>today()||(d===today()&&!on))pred.add(d)}
+ let text;if(on)text='Period day '+dayN;else if(late>0)text='Period is '+late+(late===1?' day late':' days late');else{const n=-late;text=n===0?'Period may start today':'Day '+dayN+' of your cycle · next period in about '+n+(n===1?' day':' days')}
+ return{cyc,per,starts,gaps,runs,last,dayN,next,late,on,pred,text,irregular:gaps.some(g=>g<21||g>35),long:runs.some(r=>r>7)}}
+function calHtml(ci){const t=today(),m=calMonth||t.slice(0,7),[y,mo]=m.split('-').map(Number),first=new Date(y,mo-1,1),n=new Date(y,mo,0).getDate(),lead=first.getDay();
+ const wk=[...Array(7)].map((_,i)=>new Date(2024,8,1+i).toLocaleDateString(LOC(),{weekday:'narrow'}));
+ let cells=wk.map(w=>`<span class="wd">${w}</span>`).join('')+'<span></span>'.repeat(lead);
+ for(let d=1;d<=n;d++){const ds=`${y}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`,on=!!(entries[ds]||{}).period,fut=ds>t;
+  cells+=`<button type="button" class="cd${on?' on':''}${ci.pred.has(ds)?' pred':''}${ds===t?' today':''}" data-cal="${ds}" ${fut?'disabled':''} aria-pressed="${on}" aria-label="${new Date(ds+'T12:00:00').toLocaleDateString(LOC(),{day:'numeric',month:'long'})}">${d}</button>`}
+ const label=first.toLocaleDateString(LOC(),{month:'long',year:'numeric'});
+ return`<div class="calhead"><button type="button" class="calnav" data-calnav="-1" aria-label="Previous month">‹</button><b data-notr>${label}</b><button type="button" class="calnav" data-calnav="1" aria-label="Next month" ${m>=t.slice(0,7)?'disabled':''}>›</button></div><div class="cal" data-notr>${cells}</div>
+ <div class="calkey"><span><i class="k on"></i>${T('Period')}</span><span><i class="k pred"></i>${T('Expected')}</span><span><i class="k today"></i>${T('Today')}</span></div>`}
+function cycleHtml(){const ci=cycleInfo(),fmt=d=>new Date(d+'T12:00:00').toLocaleDateString(LOC(),{day:'numeric',month:'short'});
+ const stats=ci.none?`<p class="sub" style="margin-top:12px">${T('Tap each day of your last period. After two periods the app learns your cycle.')}</p>`:
+  `<div class="cystats"><div><b>${ci.cyc}</b><span>${T('days, average cycle')}</span></div><div><b>${ci.per}</b><span>${T('days, average period')}</span></div><div><b data-notr>${fmt(ci.late>0?today():ci.next)}</b><span>${T('next period (estimate)')}</span></div></div>`;
+ const warn=(ci.gaps.length>=2&&ci.irregular)||ci.long?`<p class="warn">${T(ci.long?'One of your logged periods lasted more than 7 days. It is worth asking a doctor.':'Some of your cycles were shorter than 21 or longer than 35 days. It is worth asking a doctor.')}</p>`:'';
+ return`<div class="card cyclecard"><div class="head"><h3>${T('Period calendar')}</h3><button class="link" type="button" data-calnav="0">${T('This month')}</button></div>${calHtml(ci)}${stats}${warn}</div>
+ <div class="card"><div class="head"><h3>${T('Today')}</h3></div><p class="q" style="margin-top:0">${T('Flow')}</p><div class="chips" id="cyFlow" style="--c:#B83A6B"></div><p class="q">${T('Cramps')}</p><div class="chips" id="cyCramps" style="--c:#B83A6B"></div>
+ <p class="note" style="margin-top:12px">${T('Dates are estimates from what you log. Do not use them for birth control.')}</p></div>`}
+function mountCycle(){if(!$('#cyFlow'))return;const e=entries[today()]||{};chips('cyFlow',[['None','No period'],'Light','Medium','Heavy'],1);chips('cyCramps',['None','Mild','Strong','Severe'],1);
+ setPicked('cyFlow',e.period?[e.flow||'Medium']:e.flow==='None'?['None']:[]);setPicked('cyCramps',e.cramps?[e.cramps]:[]);
+ $('#cyFlow').addEventListener('change',()=>{const f=picked('cyFlow')[0];saveEntry(today(),f?{flow:f,period:f!=='None'}:{flow:null,period:false})});
+ $('#cyCramps').addEventListener('change',()=>saveEntry(today(),{cramps:picked('cyCramps')[0]||null}))}
+$('#careDetail').addEventListener('click',async e=>{const c=e.target.closest('[data-cal]');if(c&&!c.disabled){const d=c.dataset.cal,on=!(entries[d]||{}).period;await saveEntry(d,on?{period:true}:{period:false,flow:null});return}
+ const nv=e.target.closest('[data-calnav]');if(nv){const k=+nv.dataset.calnav,t=today().slice(0,7);if(!k)calMonth=t;else{const [y,m]=(calMonth||t).split('-').map(Number),d=new Date(y,m-1+k,1);calMonth=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;if(calMonth>t)calMonth=t}renderCareDetail()}});
 function renderCareDetail(){const a=DATA.care.find(x=>x.k===careKey);if(!a)return;const t=Lx(a),en=a.en,st=careStatus(a.k),done=new Set(((entries[today()]||{}).care||{})[a.k]||[]);
  const wd=st.days.map((d,i)=>`<div><i class="${st.lvl[i]>=2?'ok':st.lvl[i]>=1?'mid':''}"></i>${new Date(d+'T12:00:00').toLocaleDateString(LOC(),{weekday:'narrow'})}</div>`).join('');
  const foods=dishList(a.good).slice(0,8),src=(en.src||[]);
- $('#careDetail').innerHTML=`<div class="chero" style="--tint:${a.tint};--col:${a.col}"><h2 data-notr>${esc(t.t)}</h2><p class="sub" data-notr>${esc(t.s)}</p><p class="st">${esc(st.text)}</p><div class="week" style="--col:${a.col}">${wd}</div></div>
- ${t.emergency?`<div class="emer"><h3>${T('Get urgent help now if you have back pain and:')}</h3><ul data-notr>${t.emergency.map(x=>`<li>${esc(x)}</li>`).join('')}</ul><p>${T('In Japan call 119, or #7119 for advice where available.')}</p></div>`:''}
+ $('#careDetail').innerHTML=`<div class="chero" style="--tint:${a.tint};--col:${a.col}"><h2 data-notr>${esc(t.t)}</h2><p class="sub" data-notr>${esc(t.s)}</p><p class="st">${esc(st.text)}</p>${a.k==='cycle'?'':`<div class="week" style="--col:${a.col}">${wd}</div>`}</div>
+ ${a.k==='cycle'?cycleHtml():''}
+ ${t.emergency?`<div class="emer"><h3>${T('Get urgent help now if you have back pain and:')}</h3><ul data-notr>${t.emergency.map(x=>`<li>${esc(x)}</li>`).join('')}</ul><p>${T(inJP()?'In Japan call 119, or #7119 for advice where available.':'Call your local emergency number (112 in India).')}</p></div>`:''}
  <div class="card"><div class="head"><h3>${T("Today's routine")}</h3><span class="sub">${done.size}/${t.routine.length}</span></div><div class="check" id="crList" data-notr>${t.routine.map((r,i)=>`<label><input type="checkbox" data-i="${i}" ${done.has(i)?'checked':''}><span>${esc(r)}</span></label>`).join('')}</div></div>
  ${t.stretch?`<div class="card learn"><div class="head"><h3>${T('Gentle stretches')}</h3></div><ul data-notr>${t.stretch.map(x=>`<li>${esc(x)}</li>`).join('')}</ul><p class="sub" style="margin-top:8px">${T('Stop if pain gets worse. Ask a physiotherapist for exercises made for you.')}</p></div>`:''}
  ${foods.length?`<div class="card"><div class="head"><h3>${T('Foods that help')}</h3><button class="link" type="button" data-tab="food">${T('All dishes ›')}</button></div><div class="minidish">${foods.map(d=>`<button type="button" data-dish="${d.id}">${dishArt(d)}<span data-notr>${esc(Lx(d).n)}</span></button>`).join('')}</div></div>`:''}
  <div class="card learn"><div class="head"><h3>${T('1-minute read')}</h3></div><p data-notr style="font-size:14.5px">${esc(t.learn)}</p></div>
  <div class="doc"><h3>${T('See a doctor if')}</h3><ul data-notr>${t.doctor.map(x=>`<li>${esc(x)}</li>`).join('')}</ul><p class="sub" style="margin-top:8px;color:#8A2540" data-notr>${esc(T('Where to go:'))} ${esc(t.where)}</p>${src.length?`<div class="srcs">${T('Sources:')} ${src.map(([l,u])=>`<a href="${u}" target="_blank" rel="noopener">${esc(l)}</a>`).join('')}</div>`:''}</div>
  ${a.k==='skin'?`<button class="card linkcard" type="button" data-tab="skin"><span><b>${T('Skin type, photos and products')}</b></span><span class="chev">›</span></button>`:''}
- <p class="note center">${T('General wellness tips, not medical advice.')}</p>`}
+ <p class="note center">${T('General wellness tips, not medical advice.')}</p>`;mountCycle()}
 $('#careGrid').addEventListener('click',e=>{const b=e.target.closest('[data-care]');if(!b)return;careKey=b.dataset.care;go('caredetail')});
 $('#careDetail').addEventListener('change',async e=>{const i=+e.target.dataset.i;if(Number.isNaN(i))return;const c={...((entries[today()]||{}).care||{})},s=new Set(c[careKey]||[]);e.target.checked?s.add(i):s.delete(i);c[careKey]=[...s].sort();
  const a=DATA.care.find(x=>x.k===careKey),n=Lx(a).routine.length;await saveEntry(today(),{care:c});if(e.target.checked&&s.size>=n)burst($('#careDetail .chero'))});
 
 /* food */
 let foodGood='all';
-function renderFood(){const cs=cuisines();setPicked('fdCuisine',cs);setPicked('fdGood',[foodGood]);
+function renderFood(){const fm=foodMode();$('#fdMode').hidden=!showFoodMode();$$('#fdMode button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===fm));setPicked('fdGood',[foodGood]);
  const list=dishList(foodGood==='all'?null:foodGood);
- $('#fdSub').textContent=LANG==='ja'?(cs.includes('Indian')?'Indian food is on. Tap to change.':'Japanese food first. Want Indian food too? Tap “Indian”.'):(cs.includes('Japanese')?'Japanese food is on. Tap to change.':'Indian food first. Want Japanese food too? Tap “Japanese”.');
+ $('#fdSub').textContent=!showFoodMode()?'Indian home food for skin, hair, gut and energy.':fm==='Both'?'Indian and Japanese home food.':fm==='Japanese'?'Japanese home food. Tap “Indian” or “Both” for more.':'Indian home food, plus easy dishes made with Japanese shop ingredients.';
  $('#dishGrid').innerHTML=list.length?list.map(d=>{const t=Lx(d);return`<button type="button" class="dish" data-dish="${d.id}">${dishArt(d)}<div data-notr><h4>${esc(t.n)}</h4><p>${esc(t.d)}</p></div><div class="tags">${dietTag(d)}</div></button>`}).join(''):`<p class="empty">${T('No dishes match. Try another filter.')}</p>`}
-chips('fdCuisine',['Indian','Japanese','Indian × Japan']);chips('fdGood',[['all','All'],...GOODS],1);
-$('#fdCuisine').addEventListener('change',async()=>{let cs=picked('fdCuisine');if(!cs.length){cs=defaultCuisines();toast('Choose at least one')}profile={...profile,cuisines:cs};localSave();renderFood();renderPlate();renderMe();if(uid)await put('profile',profile)});
+chips('fdGood',[['all','All'],...GOODS],1);
+$('#fdMode').addEventListener('click',async e=>{const b=e.target.closest('[data-mode]');if(!b||b.dataset.mode===foodMode())return;profile={...profile,food:b.dataset.mode};localSave();renderFood();renderPlate();renderMe();if(uid)await put('profile',profile)});
 $('#fdGood').addEventListener('change',()=>{foodGood=picked('fdGood')[0]||'all';renderFood()});
 document.addEventListener('click',e=>{const a=e.target.closest('[data-ate]');if(a){e.preventDefault();const id=a.dataset.ate;toggleAte(id).then(()=>{if(!$('#sheetWrap').hidden)openDish(id)});return}
  const d=e.target.closest('[data-dish]');if(d){openDish(d.dataset.dish);return}

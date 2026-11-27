@@ -122,3 +122,31 @@ window.BC_JA={
 /* v5 additions */
 Object.assign(window.BC_JA,{"Care": "ケア", "Food": "食事", "Progress": "振り返り", "Check in": "体調チェック", "Close": "閉じる", "How do you feel today?": "今日の体調は？", "Tap a face to start. Takes 30 seconds.": "顔をタップして開始。30秒で終わります。", "Checked in today ✓ Tap a face to update.": "今日はチェック済み ✓ 顔をタップで更新できます。", "Today's plate": "今日のひと皿", "All dishes ›": "すべての料理 ›", "See dish": "料理を見る", "I ate this": "食べた", "Eaten today ✓": "今日食べた ✓", "I ate this today": "今日これを食べた", "Added to today": "今日に追加しました", "Choose the food you like in Me to see ideas.": "「マイページ」で好きな料理を選ぶと、おすすめが表示されます。", "Main ingredients": "主な材料", "Where to buy in Japan": "日本での買い方", "Home food ideas for everyday balance, not a diet or treatment.": "毎日のバランスのための家庭料理のアイデアです。ダイエットや治療ではありません。", "Home food ideas for everyday balance, not a diet or treatment. With allergies, pregnancy or a medical condition, follow your doctor's advice.": "毎日のバランスのための家庭料理のアイデアです。ダイエットや治療ではありません。アレルギー、妊娠中、持病がある場合は医師の指示に従ってください。", "Veg": "ベジ", "Egg": "卵", "Bones & teeth": "骨・歯", "All": "すべて", "30 seconds. Skip anything you like.": "30秒で終わります。答えたくない項目は飛ばしてOK。", "Skin today": "今日の肌", "A few spots": "少しある", "Some spots": "いくつかある", "Many spots": "たくさんある", "Back or body pain": "腰・からだの痛み", "Save check-in": "チェックを保存", "More details: photo and skin meter": "詳しく記録：写真・肌測定器", "Check-in saved": "チェックを保存しました", "Check in: how do you feel?": "体調チェック：今日の調子は？", "takes 30 seconds": "30秒で終わります", "Choose an area to see your week, a daily routine and when to see a doctor.": "エリアを選ぶと、今週の様子・毎日のケア・受診の目安が見られます。", "Skin type, photos and products": "肌タイプ・写真・アイテム", "Skin meter numbers, photo diary and how products suit you": "肌測定器の数値、写真日記、アイテムの相性", "‹ Care": "‹ ケア", "‹ Today": "‹ 今日", "No check-ins this week": "今週はまだ記録がありません", "No sleep logged this week": "今週は睡眠の記録がありません", "Get urgent help now if you have back pain and:": "腰痛に加えて次の症状があれば、すぐに受診を：", "In Japan call 119, or #7119 for advice where available.": "日本では119番へ。地域によっては#7119で相談できます。", "Today's routine": "今日のケア", "Gentle stretches": "やさしいストレッチ", "Stop if pain gets worse. Ask a physiotherapist for exercises made for you.": "痛みが強くなったら中止を。自分に合った運動は理学療法士に相談しましょう。", "Foods that help": "役立つ食べ物", "1-minute read": "1分で読める", "See a doctor if": "こんなときは受診を", "Where to go:": "受診先：", "Sources:": "出典：", "General wellness tips, not medical advice.": "一般的な健康情報であり、医療アドバイスではありません。", "Indian": "インド料理", "Japanese": "和食", "Indian × Japan": "インド×日本の食材", "Which food do you like?": "好きな料理は？", "Food I like": "好きな料理", "Choose at least one": "1つ以上選んでください", "No dishes match. Try another filter.": "条件に合う料理がありません。別の条件を選んでください。", "Indian food first. Want Japanese food too? Tap “Japanese”.": "インド料理を表示中。和食も見たい場合は「和食」をタップ。", "Japanese food is on. Tap to change.": "和食も表示中。タップで変更できます。", "Japanese food first. Want Indian food too? Tap “Indian”.": "和食を表示中。インド料理も見たい場合は「インド料理」をタップ。", "Indian food is on. Tap to change.": "インド料理も表示中。タップで変更できます。", "day streak": "日連続", "check-ins this week": "今週のチェック", "glasses a day": "1日の水分（杯）", "healthy dishes eaten": "食べたヘルシー料理", "Healthy Indian and Japanese home food": "インドと日本のヘルシーな家庭料理"});
 window.BC_JA_PAT=[[/^Acne this week: ([\d.]+)\/5$/,m=>`今週のニキビ：${m[1]}/5`],[/^(\d+) high hair-fall days? this week$/,m=>`今週、抜け毛が多い日：${m[1]}日`],[/^(\d+) dry-lip days? this week$/,m=>`今週、唇が荒れた日：${m[1]}日`],[/^Pain this week: ([\d.]+)\/10$/,m=>`今週の痛み：${m[1]}/10`],[/^(\d+)\/7 normal toilet days$/,m=>`お通じ普通の日：${m[1]}/7`],[/^Sleep this week: ([\d.]+)h$/,m=>`今週の睡眠：平均${m[1]}時間`]];
+
+/* v6: period and cycle, region, food switch */
+Object.assign(window.BC_JA,{
+ 'Periods':'生理','Both':'両方','Japan':'日本','India':'インド','Other country':'その他の国',
+ 'Where do you live?':'お住まいの国は？','Which food do you want to see?':'表示する料理は？','I live in':'住んでいる国','Food to show':'表示する料理','Food to show ':'表示する料理',
+ 'Period calendar':'生理カレンダー','This month':'今月','Period':'生理','Expected':'予測','Today':'今日','Flow':'量','Cramps':'生理痛',
+ 'No period':'生理なし','Light':'少なめ','Medium':'普通','Heavy':'多め','Mild':'軽い','Strong':'強い','Severe':'とても強い','None':'なし',
+ 'Period today':'今日の生理','days, average cycle':'日（平均周期）','days, average period':'日（平均期間）','next period (estimate)':'次の生理（予測）',
+ 'Tap each day of your last period. After two periods the app learns your cycle.':'前回の生理の日をタップしてください。2回分記録すると周期がわかるようになります。',
+ 'Tap your period days in the calendar':'カレンダーで生理の日をタップ',
+ 'Period may start today':'今日、生理が始まるかもしれません',
+ 'Dates are estimates from what you log. Do not use them for birth control.':'日付は記録からの予測です。避妊には使わないでください。',
+ 'One of your logged periods lasted more than 7 days. It is worth asking a doctor.':'記録した生理の中に7日以上続いたものがあります。医師に相談してみましょう。',
+ 'Some of your cycles were shorter than 21 or longer than 35 days. It is worth asking a doctor.':'周期が21日より短い、または35日より長いことがありました。医師に相談してみましょう。',
+ 'Previous month':'前の月','Next month':'次の月',
+ 'Period care':'生理のケア','Warmth on your tummy and iron-rich food help on period days. Log your days in Care → Period and cycle.':'生理中はお腹を温め、鉄分の多い食事を。ケア → 生理・周期で記録できます。',
+ 'Call your local emergency number (112 in India).':'お住まいの地域の緊急番号に電話してください（インドは112）。',
+ 'Indian home food for skin, hair, gut and energy.':'肌・髪・腸・元気のためのインドの家庭料理。',
+ 'Indian and Japanese home food.':'インドと日本の家庭料理。',
+ 'Japanese home food. Tap “Indian” or “Both” for more.':'日本の家庭料理。「インド料理」か「両方」でさらに表示。',
+ 'Indian home food, plus easy dishes made with Japanese shop ingredients.':'インドの家庭料理と、日本のお店の食材で作れる簡単な料理。',
+ 'Good for':'効果','Healthy home food':'ヘルシーな家庭料理'
+});
+(window.BC_JA_PAT=window.BC_JA_PAT||[]).push(
+ [/^Period day (\d+)$/,m=>`生理${m[1]}日目`],
+ [/^Period is (\d+) days? late$/,m=>`生理が${m[1]}日遅れています`],
+ [/^Day (\d+) of your cycle · next period in about (\d+) days?$/,m=>`周期${m[1]}日目 · 次の生理まで約${m[2]}日`]
+);

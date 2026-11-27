@@ -126,7 +126,8 @@
    <p class="q">Language</p>
    <div class="seg sm langseg" role="group" aria-label="Language" data-notr style="max-width:260px"><button type="button" data-lang="en">English</button><button type="button" data-lang="ja">日本語</button></div>
    <p class="q">What do you eat?</p><div class="chips" id="obDiet" style="--c:var(--gut)"></div>
-   <p class="q">Which food do you like?</p><div class="chips" id="obCuisine" style="--c:var(--berry)"></div>
+   <p class="q">Where do you live?</p><div class="chips" id="obRegion" style="--c:var(--gut)"></div>
+   <div id="obCuisineRow"><p class="q">Which food do you want to see?</p><div class="chips" id="obCuisine" style="--c:var(--berry)"></div></div>
    <p class="q">What do you want to care for?</p><div class="chips" id="obConcerns"></div>
    <p class="q">When do you wake up?</p><div class="chips" id="obWake" style="--c:var(--sleep)"></div>
    <p class="q">Breastfeeding now?</p><div class="chips" id="obFeed"></div>
@@ -228,7 +229,8 @@
    <div class="form">
     <label class="field">Body weight (kg)<input type="number" id="pW" inputmode="decimal"></label>
     <p class="q" style="margin:4px 0 0">Diet</p><div class="chips" id="diet" style="--c:var(--gut)"></div>
-    <p class="q" style="margin:4px 0 0">Food I like</p><div class="chips" id="cuisine" style="--c:var(--berry)"></div>
+    <p class="q" style="margin:4px 0 0">I live in</p><div class="chips" id="region" style="--c:var(--gut)"></div>
+    <div id="cuisineRow" class="form"><p class="q" style="margin:4px 0 0">Food to show</p><div class="chips" id="cuisine" style="--c:var(--berry)"></div></div>
     <p class="q" style="margin:4px 0 0">Breastfeeding now?</p><div class="chips" id="feed"></div>
     <p class="q" style="margin:4px 0 0">I want to improve</p><div class="chips" id="concerns"></div>
     <p class="q" style="margin:4px 0 0">I wake up at</p><div class="chips" id="wake" style="--c:var(--sleep)"></div>
@@ -303,11 +305,11 @@
 
  <!-- FOOD -->
  <section class="view" id="v-food" data-view="food" hidden>
-  <div class="foodshot wide w12" role="img" aria-label="Healthy Indian and Japanese home food"><img src="images/food/hero.jpg" alt="" onerror="this.remove()"></div>
+  <div class="foodshot wide slim w12" role="img" aria-label="Healthy home food"><img src="images/food/hero.jpg" alt="" onerror="this.remove()"></div>
   <div class="w12"><h2>Food</h2><p class="sub" style="margin-top:4px" id="fdSub"></p></div>
   <div class="w12 foodfilters">
-   <div class="chips" id="fdCuisine" style="--c:var(--berry)"></div>
-   <div class="chips" id="fdGood" style="--c:var(--gut)"></div>
+   <div class="seg three" id="fdMode" role="group" aria-label="Food to show"><button type="button" data-mode="Indian">Indian</button><button type="button" data-mode="Japanese">Japanese</button><button type="button" data-mode="Both">Both</button></div>
+   <div class="chips soft" id="fdGood" style="--c:var(--gut)" aria-label="Good for"></div>
   </div>
   <div class="dishgrid w12" id="dishGrid"></div>
   <p class="note center w12">Home food ideas for everyday balance, not a diet or treatment. With allergies, pregnancy or a medical condition, follow your doctor's advice.</p>

@@ -413,3 +413,44 @@ details[open] summary::after{content:"–"}
 .plainbtn{border:0;background:none;padding:0;width:100%;display:block}
 main{padding-bottom:calc(var(--tab) + var(--safe) + 90px)}
 @media(min-width:900px){main{padding-bottom:96px}.tips{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+
+/* ---------- v6 ---------- */
+/* food page: slimmer banner, one clean switch, lighter filter chips, smaller cards */
+.foodshot.wide.slim{height:110px}
+@media(min-width:900px){.foodshot.wide.slim{height:150px}}
+.seg.three{grid-template-columns:repeat(3,1fr);max-width:360px}
+.seg[hidden]{display:none}
+.foodfilters{display:grid;gap:12px}
+.chips.soft .chip{min-height:34px;padding:0 14px;font-size:13.5px}
+.chips.soft .chip[aria-pressed=true]{background:color-mix(in srgb,var(--c) 14%,#fff);color:var(--c);border-color:color-mix(in srgb,var(--c) 45%,#fff)}
+.dish .dishart{aspect-ratio:4/3;border-radius:14px}
+.dish{padding:8px;gap:6px}
+.dish h4{font-size:15px}
+@media(min-width:600px){.dishgrid{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}}
+@media(min-width:900px){.dishgrid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}}
+
+/* period calendar */
+.calhead{display:flex;align-items:center;justify-content:space-between;margin:2px 0 10px}
+.calhead b{font-weight:600}
+.calnav{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:#fff;font-size:20px;line-height:1;color:var(--ink)}
+.calnav:disabled{opacity:.35}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center;max-width:420px;margin:0 auto}
+.cal .wd{font-size:12px;color:var(--muted);padding-bottom:2px}
+.cd{aspect-ratio:1;border:0;border-radius:50%;background:none;font:inherit;font-size:14px;color:var(--ink);display:grid;place-items:center;transition:background .15s,transform .15s}
+.cd:not(:disabled):hover{background:#FBE5EE}
+.cd:disabled{color:#C9BDC3}
+.cd.pred{box-shadow:inset 0 0 0 1.5px #B83A6B;border:0;background:repeating-linear-gradient(45deg,#FBE5EE 0 3px,#fff 3px 6px)}
+.cd.on{background:#B83A6B;color:#fff;font-weight:600}
+.cd.today{outline:2px solid var(--ink);outline-offset:1px}
+.cd:active{transform:scale(.92)}
+.calkey{display:flex;gap:16px;justify-content:center;font-size:12.5px;color:var(--muted);margin-top:12px;flex-wrap:wrap}
+.calkey span{display:flex;align-items:center;gap:6px}
+.calkey .k{width:12px;height:12px;border-radius:50%;display:inline-block}
+.k.on{background:#B83A6B}.k.pred{box-shadow:inset 0 0 0 1.5px #B83A6B;background:#FBE5EE}.k.today{box-shadow:inset 0 0 0 2px var(--ink)}
+.cystats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.cystats div{background:#FBE5EE;border-radius:14px;padding:10px;text-align:center}
+.cystats b{display:block;font-family:"Young Serif",serif;font-weight:400;font-size:22px;color:#8A2550}
+.cystats span{font-size:12px;color:var(--muted)}
+@media(prefers-reduced-motion:reduce){.cd{transition:none}}
+#cuisineRow[hidden],#obCuisineRow[hidden]{display:none}
+.cd.pred:disabled{color:#8A2550}
